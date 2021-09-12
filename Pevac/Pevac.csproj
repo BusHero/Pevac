@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Cervac Petru</Authors>
+    <Company />
+    <Product>A parser combinator library around the System.Text.Json.Utf8JsonReader struct</Product>
+    <Description>A parser combinator library to simplify JSON deserialization using the System.Text.Json.UTF8JsonReader struct</Description>
+    <Copyright>2021</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/BusHero/Pevac</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BusHero/Pevac</RepositoryUrl>
+    <PackageTags>System.Text.Json ParserCombinator Utf8JsonReader</PackageTags>
+    <PackageReleaseNotes>This is the prerelease</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>
