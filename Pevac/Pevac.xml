@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Pevac</name>
+    </assembly>
+    <members>
+        <member name="T:Pevac.Parser`1">
+            <summary>
+            Represents a parser.
+            </summary>
+            <typeparam name="T">The type of the result.</typeparam>
+            <param name="input">The input to the parser.</param>
+            <param name="options">The options to the parser.</param>
+            <returns>The result of the parser.</returns>
+        </member>
+    </members>
+</doc>
