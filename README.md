@@ -14,3 +14,4 @@ Utf8JsonReader has some restrictions that won't allow to use it in any existing 
 1. You cannot specify Utf8JsonReader as a generic parameter
 2. All the interaction with the Utf8JsonReader should be through a reference.
 
+Some change here
