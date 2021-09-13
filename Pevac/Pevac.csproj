@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.0.1</Version>
+    <VersionPrefix>0.0.1</VersionPrefix>
     <Authors>Cervac Petru</Authors>
     <Company />
     <Product>A parser combinator library around the System.Text.Json.Utf8JsonReader struct</Product>
