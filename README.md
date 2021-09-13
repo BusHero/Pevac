@@ -34,3 +34,7 @@ var foo = parser.Parse(reader, default);
 Assert.AreEqual(new Foo("foo", "bar"), foo);
 
 ```
+
+## Credits
+
+[![](https://avatars1.githubusercontent.com/u/1999078?v=3&s=200)](https://github.com/sprache/Sprache)
