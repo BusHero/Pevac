@@ -36,9 +36,21 @@ namespace Pevac
         public static Parser<Void> StringToken { get; } = ParseToken(JsonTokenType.String);
 
         /// <summary>
+        /// Parser for the <see cref="System.Text.Json.JsonTokenType.String"/> 
+        /// or <see cref="System.Text.Json.JsonTokenType.None"/> token.
+        /// </summary>
+        public static Parser<Void> OptionalStringToken { get; } = ParseToken(JsonTokenType.String, JsonTokenType.Null);
+
+        /// <summary>
         /// Parser for the <see cref="System.Text.Json.JsonTokenType.Number"/> token.
         /// </summary>
         public static Parser<Void> NumberToken { get; } = ParseToken(JsonTokenType.Number);
+
+        /// <summary>
+        /// Parser for the <see cref="System.Text.Json.JsonTokenType.Number"/> 
+        /// or <see cref="System.Text.Json.JsonTokenType.Null"/> token.
+        /// </summary>
+        public static Parser<Void> OptionalNumber { get; } = ParseToken(JsonTokenType.Number, JsonTokenType.Null);
 
         /// <summary>
         /// Parser for the <see cref="System.Text.Json.JsonTokenType.True"/> token.
@@ -46,39 +58,38 @@ namespace Pevac
         public static Parser<Void> TrueToken { get; } = ParseToken(JsonTokenType.True);
 
         /// <summary>
+        /// Parser for the <see cref="System.Text.Json.JsonTokenType.True"/> 
+        /// or <see cref="System.Text.Json.JsonTokenType.Null"/> tokens.
+        /// </summary>
+        public static Parser<Void> OptionalTrueToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.Null);
+
+        /// <summary>
         /// Parser for the <see cref="System.Text.Json.JsonTokenType.False"/> token.
         /// </summary>
         public static Parser<Void> FalseToken { get; } = ParseToken(JsonTokenType.False);
 
         /// <summary>
+        /// Parser for the <see cref="System.Text.Json.JsonTokenType.False"/> 
+        /// or <see cref="System.Text.Json.JsonTokenType.Null"/> tokens.
+        /// </summary>
+        public static Parser<Void> OptionalFalseToken { get; } = ParseToken(JsonTokenType.False, JsonTokenType.Null);
+
+        /// <summary>
         /// Parser for the <see cref="System.Text.Json.JsonTokenType.True"/> 
         /// or <see cref="System.Text.Json.JsonTokenType.False"/> tokens.
         /// </summary>
-        public static Parser<Void> TrueOrFalseToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False);
+        public static Parser<Void> BooleanToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False);
+
+        /// <summary>
+        /// Parser for the <see cref="System.Text.Json.JsonTokenType.True"/> 
+        /// or <see cref="System.Text.Json.JsonTokenType.False"/> 
+        /// or <see cref="System.Text.Json.JsonTokenType.Null"/> tokens.
+        /// </summary>
+        public static Parser<Void> OptionalBooleanToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
 
         /// <summary>
         /// Parser for the <see cref="System.Text.Json.JsonTokenType.Null"/> token.
         /// </summary>
         public static Parser<Void> NullToken { get; } = ParseToken(JsonTokenType.Null);
-
-
-        /// <summary>
-        /// Parser for the <see cref="System.Text.Json.JsonTokenType.EndObject"/> token.
-        /// </summary>
-        public static Parser<DateTime?> OptionalDateTime { get; } = TryParse(StringToken.Or(NullToken), (ref Utf8JsonReader reader, out DateTime? value, JsonSerializerOptions? _) =>
-        {
-            bool result = false;
-            (value, result) = reader.GetString() switch
-            {
-                null => (default(DateTime?), true),
-                var str when System.DateTime.TryParse(str, out DateTime dt) => (dt, true),
-                _ => (default(DateTime?), false)
-            };
-            return result;
-        });
-
-        
-
-        
     }
 }

@@ -6,9 +6,37 @@ namespace Pevac
 {
     public partial class Parser
     {
-        public static Parser<string> OptionalString { get; } = Parse(StringToken.Or(NullToken), (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.GetString());
-        public static Parser<string> String { get; } = Parse(StringToken, (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.GetString());
-        public static Parser<bool> Bool { get; } = Parse(TrueOrFalseToken, (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.GetBoolean());
+        /// <summary>
+        /// Parse a string value.
+        /// </summary>
+        public static Parser<string?> String { get; } = Parse(StringToken, (ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString());
+
+        /// <summary>
+        /// Parse an optional string.
+        /// </summary>
+        public static Parser<string?> OptionalString { get; } = Parse(OptionalStringToken, (ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString());
+
+        /// <summary>
+        /// Parse a boolean value.
+        /// </summary>
+        public static Parser<bool> Bool { get; } = Parse(BooleanToken, (ref Utf8JsonReader reader, JsonSerializerOptions? _) => 
+        {
+                return reader.GetBoolean();
+        });
+
+        public static Parser<DateTime?> OptionalDateTime { get; } = TryParse(StringToken.Or(NullToken), (ref Utf8JsonReader reader, out DateTime? value, JsonSerializerOptions? _) =>
+        {
+            bool result = false;
+            (value, result) = reader.GetString() switch
+            {
+                null => (default(DateTime?), true),
+                var str when System.DateTime.TryParse(str, out DateTime dt) => (dt, true),
+                _ => (default(DateTime?), false)
+            };
+            return result;
+        });
+
+        
         public static Parser<Guid> Guid { get; } = TryParse(StringToken, (ref Utf8JsonReader reader, out Guid guid, JsonSerializerOptions _) => reader.TryGetGuid(out guid));
         public static Parser<byte> Byte { get; } = TryParse(NumberToken, (ref Utf8JsonReader reader, out byte value, JsonSerializerOptions _) => reader.TryGetByte(out value));
         public static Parser<byte[]> BytesFromBase64 { get; } = TryParse(NumberToken, (ref Utf8JsonReader reader, out byte[] value, JsonSerializerOptions _) => reader.TryGetBytesFromBase64(out value));
