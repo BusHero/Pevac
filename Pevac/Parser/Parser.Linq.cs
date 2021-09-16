@@ -53,8 +53,8 @@ namespace Pevac
             (_, null) => throw new ArgumentNullException(nameof(predicate)),
             _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser(ref reader, options) switch
             {
-                var result when result.IsSuccess(out var item) && !predicate(item) => Result.Failure<T?>($"Unnexpected value {item}"),
-                var result => result
+                Success<T?> success when !predicate(success.Value) => Result.Failure<T?>($"Unnexpected value {success.Value}"),
+                var result => result,
             }
         };
     }

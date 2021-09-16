@@ -4,32 +4,8 @@ using System.Text.Json;
 
 namespace Pevac
 {
-    public static partial class Parser
+    public partial class Parser
     {
-        public static Parser<None> StartObjectToken { get; } = ParseToken(JsonTokenType.StartObject);
-        public static Parser<None> EndObjectToken { get; } = ParseToken(JsonTokenType.EndObject);
-        public static Parser<None> StartArrayToken { get; } = ParseToken(JsonTokenType.StartArray);
-        public static Parser<None> EndArrayToken { get; } = ParseToken(JsonTokenType.EndArray);
-        public static Parser<None> PropertyNameToken { get; } = ParseToken(JsonTokenType.PropertyName);
-        public static Parser<None> StringToken { get; } = ParseToken(JsonTokenType.String);
-        public static Parser<None> NumberToken { get; } = ParseToken(JsonTokenType.Number);
-        public static Parser<None> TrueToken { get; } = ParseToken(JsonTokenType.True);
-        public static Parser<None> FalseToken { get; } = ParseToken(JsonTokenType.False);
-        public static Parser<None> TrueOrFalseToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False);
-        public static Parser<None> NullToken { get; } = ParseToken(JsonTokenType.Null);
-
-        public static Parser<DateTime?> OptionalDateTime { get; } = TryParse(StringToken.Or(NullToken), (ref Utf8JsonReader reader, out DateTime? value, JsonSerializerOptions _) =>
-        {
-            bool result = false;
-            (value, result) = reader.GetString() switch
-            {
-                null => (default(DateTime?), true),
-                var str when System.DateTime.TryParse(str, out DateTime dt) => (dt, true),
-                _ => (default(DateTime?), false)
-            };
-            return result;
-        });
-
         public static Parser<string> OptionalString { get; } = Parse(StringToken.Or(NullToken), (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.GetString());
         public static Parser<string> String { get; } = Parse(StringToken, (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.GetString());
         public static Parser<bool> Bool { get; } = Parse(TrueOrFalseToken, (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.GetBoolean());
@@ -51,13 +27,11 @@ namespace Pevac
 
         public static Parser<string> PropertyName { get; } = Parse(PropertyNameToken, (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.GetString());
 
-        public static Parser<None> ParseToken(params JsonTokenType[] tokens) => (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.Read() switch
+        public static Parser<Void> ParseToken(params JsonTokenType[] tokens) => (ref Utf8JsonReader reader, JsonSerializerOptions _) => reader.Read() switch
         {
-            false => Result.Failure<None>("Cannot read the next token. You've probably reached the end of stream"),
-            true when tokens.Contains(reader.TokenType) => Result.Success(None.Instance),
-            _ => Result.Failure<None>(""),
+            false => Result.Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
+            true when tokens.Contains(reader.TokenType) => Result.Success(Void.Default),
+            _ => Result.Failure<Void>(""),
         };
-
-        
     }
 }

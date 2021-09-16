@@ -13,5 +13,156 @@
             <param name="options">The options to the parser.</param>
             <returns>The result of the parser.</returns>
         </member>
+        <member name="M:Pevac.Parser.Select``2(Pevac.Parser{``0},System.Func{``0,``1})">
+            <summary>
+            Take the result of parsing, and project it ont a different domain.
+            </summary>
+            <typeparam name="TSource">The type of the element of <paramref name="source"/>.</typeparam>
+            <typeparam name="TResult">The type of the value returned by <paramref name="selector"/>.</typeparam>
+            <param name="source">A parser to invoke a transform function on.</param>
+            <param name="selector">A transform function to apply to the value of parser.</param>
+            <returns>A Parser whose result is the result of invokiung the transform function on the result of <paramref name="source"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="source"/> or <paramref name="selector"/> is null.</exception>
+        </member>
+        <member name="M:Pevac.Parser.SelectMany``3(Pevac.Parser{``0},System.Func{``0,Pevac.Parser{``1}},System.Func{``0,``1,``2})">
+            <summary>
+            Monadic combinator Then, adapted for Linq comprehension syntax
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="U"></typeparam>
+            <typeparam name="V"></typeparam>
+            <param name="parser"></param>
+            <param name="selector"></param>
+            <param name="projector"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pevac.Parser.Where``1(Pevac.Parser{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Succeds if the parsed value matches predicate
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parser"></param>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Pevac.Result">
+            <summary>
+            Provides a set of static methods to simplify the interaction with the <see cref="T:Pevac.Result`1"/> class.
+            </summary>
+        </member>
+        <member name="M:Pevac.Result.Failure``1(System.String)">
+            <summary>
+            Generates a failed <see cref="T:Pevac.Result`1"/> with the message specified by the <paramref name="message"/>.
+            </summary>
+            <typeparam name="T">The type of the resulting <see cref="T:Pevac.Result`1"/>.</typeparam>
+            <param name="message">The message of the result.</param>
+            <returns>A result.</returns>
+        </member>
+        <member name="M:Pevac.Result.Success``1(``0)">
+            <summary>
+            Creates a succesfull <see cref="T:Pevac.Result`1"/> with the <paramref name="value"/> as the result.
+            </summary>
+            <typeparam name="T">The type of the result.</typeparam>
+            <param name="value">The value of the result.</param>
+            <returns>A result.</returns>
+        </member>
+        <member name="M:Pevac.Result.Match``2(Pevac.Result{``0},System.Func{``0,``1},System.Func{System.String,``1})">
+            <summary>
+            Matches a result
+            </summary>
+            <typeparam name="T">The type of the result.</typeparam>
+            <typeparam name="U">The output value.</typeparam>
+            <param name="result">The result on which to perform the match.</param>
+            <param name="success">Function to invoke when result is succesful.</param>
+            <param name="failure">Function to invoke when result is a failure.</param>
+            <returns></returns>
+            <example>
+            How to use the function
+            <code>
+                string foo = result.Match(success: (int value) => $"{value}",
+                                          failure: (string message) => "");
+            </code>
+            </example>
+        </member>
+        <member name="M:Pevac.Result.IfFailure``1(Pevac.Result{``0},System.Func{System.String,``0})">
+            <summary>
+            Will try to get an alternative value in case the result is a failure
+            </summary>
+            <typeparam name="T">The type of the result</typeparam>
+            <param name="result">The result.</param>
+            <param name="alternative">A method that takes as input the error message and returns back an alternative value.</param>
+            <returns>The value of the result, in case the result is succesfull, otherwise the result of invoking <paramref name="alternative"/> function.</returns>
+        </member>
+        <member name="M:Pevac.Result.IfFailure``1(Pevac.Result{``0},System.Func{``0})">
+            <param name="alternative">A method that returns an alternative value.</param>
+            <inheritdoc cref="!:IfFailure&lt;T&gt;(Result&lt;T?&gt;, Func&lt;string, T?&gt;)"/>
+        </member>
+        <member name="M:Pevac.Result.IfFailure``1(Pevac.Result{``0},``0)">
+            <param name="alternative">The alternative value.</param>
+            <returns>The value of the result, in case the result is succesful, otherwise the <paramref name="alternative"/>.</returns>
+            <inheritdoc cref="!:IfFailure&lt;T&gt;(Result&lt;T?&gt;, Func&lt;string, T?&gt;)"/>
+        </member>
+        <member name="M:Pevac.Result.Success``2(Pevac.Result{``0},System.Func{``0,``1})">
+            <summary>
+            Specifies a transform function that will be invoked if the result is succesful. It's a part of the fluent interface. 
+            </summary>
+            <typeparam name="T">The type of the source.</typeparam>
+            <typeparam name="U">The type of the result.</typeparam>
+            <param name="result">The result object on which to invoke the the transform function.</param>
+            <param name="success">A transform function to be invoked if the result is succesfull.</param>
+            <example>
+            This shows how the method is supposed to be used.
+            <code>
+                string foo = bar
+                    .IsSuccess((int number) => $"{number}")
+                    .IsFailure((string message) => "");
+            </code>
+            </example>
+        </member>
+        <member name="M:Pevac.Result.Failure``2(Pevac.Result{``0},System.Func{System.String,``1})">
+            <summary>
+            Specifies a transform function that will be invoked if the result is failure. It's a part of the fluent interface. 
+            </summary>
+            <typeparam name="T">The type of the source.</typeparam>
+            <typeparam name="U">The type of the result.</typeparam>
+            <param name="result">The result object on which to invoke the the transform function.</param>
+            <param name="failure">A transform function to be invoked if the result is a failure.</param>
+            <example>
+            This shows how the method is supposed to be used.
+            <code>
+                string foo = bar
+                    .IsFailure((string message) => "");
+                    .IsSuccess((int number) => $"{number}")
+            </code>
+            </example>
+        </member>
+        <member name="T:Pevac.Result.ISuccess`2">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <typeparam name="U"></typeparam>
+        </member>
+        <member name="M:Pevac.Result.ISuccess`2.Failure(System.Func{System.String,`1})">
+            <summary>
+            A method to specify a failure method
+            </summary>
+            <param name="failure">A method that will be invoked if the result is a failure</param>
+            <returns>The result of the evaluation.</returns>
+        </member>
+        <member name="T:Pevac.Result.IFailure`2">
+            <summary>
+            Allows to specify the function to be invoked when the result is a success.
+            </summary>
+            <typeparam name="T">Type of the input.</typeparam>
+            <typeparam name="U">Type of the output.</typeparam>
+        </member>
+        <member name="M:Pevac.Result.IFailure`2.Success(System.Func{`0,`1})">
+            <summary>
+            Specifies a function to be invoked when the result is a success.
+            </summary>
+            <param name="success">The function to be invoked when the result is a success.</param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

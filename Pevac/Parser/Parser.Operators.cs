@@ -7,69 +7,68 @@ namespace Pevac
 {
     public static partial class Parser
     {
-        public static T Parse<T>(this Parser<T> parser, ref Utf8JsonReader reader, JsonSerializerOptions options) => parser(ref reader, options)
+        public static T? ThrowIfFailure<T>(this Result<T?> result) => result switch
+        {
+            null => throw new ArgumentNullException(nameof(result)),
+            Success<T> success => success.Value,
+            Failure<T> failure => throw new WhatAFuckException(failure.Message),
+            _ => throw new WhatAFuckException("You shouldn't see this")
+        };
+
+        public static T? Parse<T>(this Parser<T> parser, ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser(ref reader, options)
             .ThrowIfFailure();
 
-        public static Parser<U> Then<T, U>(this Parser<T> first, Func<T, Parser<U>> second) => (first, second) switch
+        public static Parser<U?> Then<T, U>(this Parser<T?> first, Func<T?, Parser<U?>> second) => (first, second) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(first)),
             (_, null) => throw new ArgumentNullException(nameof(second)),
-            _ => (ref Utf8JsonReader reader, JsonSerializerOptions options) => first(ref reader, options) switch
+            _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => first(ref reader, options) switch
             {
-                var result when result.IsSuccess(out var value) => second(value)(ref reader, options),
-                var result when result.IsFailure(out string message) => Result.Failure<U>(message),
+                Success<T> success => second(success.Value)(ref reader, options),
+                Failure<T> failure => Result.Failure<U>(failure.Message),
                 _ => throw new WhatAFuckException()
             }
         };
 
-        public static Parser<U> Then<T, U>(this Parser<T> first, Parser<U> second) => (first, second) switch
+        public static Parser<U?> Then<T, U>(this Parser<T?> first, Parser<U?> second) => (first, second) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(first)),
             (_, null) => throw new ArgumentNullException(nameof(second)),
-            _ => (ref Utf8JsonReader reader, JsonSerializerOptions options) => first(ref reader, options) switch
+            _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => first(ref reader, options) switch
             {
-                var result when result.IsSuccess(out var value) => second(ref reader, options),
-                var result when result.IsFailure(out string message) => Result.Failure<U>(message),
+                Success<T> success => second(ref reader, options),
+                Failure<T> failure => Result.Failure<U>(failure.Message),
                 _ => throw new WhatAFuckException()
             }
         };
 
 
 
-        public static Parser<T> Where<T>(this Parser<T> parser, Func<T, bool> predicate) => (parser, predicate) switch
-        {
-            (null, _) => throw new ArgumentNullException(nameof(parser)),
-            (_, null) => throw new ArgumentNullException(nameof(predicate)),
-            _ => (ref Utf8JsonReader reader, JsonSerializerOptions options) => parser(ref reader, options) switch
-            {
-                var result when result.IsSuccess(out var item) && !predicate(item) => Result.Failure<T>($"Unnexpected value {item}"),
-                var result => result
-            }
-        };
+        
 
         public static Parser<T> Or<T>(this Parser<T> first, Parser<T> second) => (first, second) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(first)),
             (_, null) => throw new ArgumentNullException(nameof(second)),
-            _ => (ref Utf8JsonReader reader, JsonSerializerOptions options) =>
+            _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) =>
             {
                 var forFirst = reader;
                 switch (first(ref forFirst, options))
                 {
-                    case var result when result.IsSuccess(out var item):
+                    case Success<T?> success:
                         reader = forFirst;
-                        return result;
+                        return success;
                     default:
                         return second(ref reader, options);
                 }
             }
         };
 
-        public static Parser<T> Failure<T>(string message = "some default message") => (ref Utf8JsonReader _, JsonSerializerOptions _) => Result.Failure<T>(message);
+        public static Parser<T?> Failure<T>(string message = "some default message") => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result.Failure<T>(message);
 
-        public static Parser<T> Return<T>(T value) => (ref Utf8JsonReader _, JsonSerializerOptions _) => Result.Success(value);
+        public static Parser<T?> Return<T>(T? value) => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result.Success(value);
 
-        public static Parser<U> Return<T, U>(this Parser<T> parser, U value) => parser switch
+        public static Parser<U?> Return<T, U>(this Parser<T?> parser, U? value) => parser switch
         {
             null => throw new ArgumentNullException(nameof(parser)),
             _ => parser.Select(t => value)
@@ -80,7 +79,7 @@ namespace Pevac
             return default;
         }
 
-        public static Parser<T> ParseType<T>() => (ref Utf8JsonReader reader, JsonSerializerOptions options) =>
+        public static Parser<T?> ParseType<T>() => (ref Utf8JsonReader reader, JsonSerializerOptions? options) =>
         {
             try
             {
@@ -93,20 +92,24 @@ namespace Pevac
             }
         };
 
-        public static Parser<T> ParseTypeProperty<T>(string propertyName) => from _ in ParsePropertyName(propertyName)
-                                                                             from type in ParseType<T>()
-                                                                             select type;
+        public static Parser<T?> ParseTypeProperty<T>(string propertyName) => propertyName switch
+        {
+            null => throw new ArgumentNullException(nameof(propertyName)),
+            not null => from _ in ParsePropertyName(propertyName)
+                        from type in ParseType<T>()
+                        select type
+        };
 
-        public static Parser<IEnumerable<T>> Many<T>(this Parser<T> parser) => parser switch
+        public static Parser<IEnumerable<T>?> Many<T>(this Parser<T> parser) => parser switch
         {
             null => throw new ArgumentNullException(nameof(parser)),
-            not null => (ref Utf8JsonReader reader, JsonSerializerOptions options) =>
+            not null => (ref Utf8JsonReader reader, JsonSerializerOptions? options) =>
             {
                 var list = new List<T>();
                 var nextReader = reader;
-                while (parser(ref nextReader, options).IsSuccess(out T value))
+                while (parser(ref nextReader, options) is Success<T> success)
                 {
-                    list.Add(value);
+                    list.Add(success.Value);
                     reader = nextReader;
                 }
                 return Result.Success(list.AsEnumerable());

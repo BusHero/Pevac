@@ -4,6 +4,9 @@ using System.Text.Json;
 
 namespace Pevac
 {
+    /// <summary>
+    /// Contains a bunch of utilities.
+    /// </summary>
     public static partial class Parser
     {
         public static Parser<System.Uri> Uri { get; } = from uri in String
@@ -24,19 +27,19 @@ namespace Pevac
                                                             };
 
 
-        public static Parser<None> EmptyObject { get; } = StartObjectToken.Then(EndObjectToken);
+        public static Parser<Void> EmptyObject { get; } = StartObjectToken.Then(EndObjectToken);
 
-        public static Parser<string> ParseString(params string[] expectedValue) => (ref Utf8JsonReader reader, JsonSerializerOptions options) => String(ref reader, options) switch
+        public static Parser<string> ParseString(params string[] expectedValue) => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => String(ref reader, options) switch
         {
-            var result when result.IsSuccess(out var actualValue) && !expectedValue.Contains(actualValue) =>
-                Result.Failure<string>($"\"{expectedValue}\" was expected, but \"{actualValue}\" recieved"),
+            Success<string?> success when !expectedValue.Contains(success.Value) => 
+                Result.Failure<string>($"\"{expectedValue}\" was expected, but \"{success.Value}\" recieved"),
             var result => result
         };
 
-        public static Parser<string> ParsePropertyName(string expectedPropertyName) => (ref Utf8JsonReader reader, JsonSerializerOptions options) => PropertyName(ref reader, options) switch
+        public static Parser<string?> ParsePropertyName(string expectedPropertyName) => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => PropertyName(ref reader, options) switch
         {
-            var result when result.IsSuccess(out var actualPropertyName) && actualPropertyName != expectedPropertyName =>
-                Result.Failure<string>($"\"{expectedPropertyName}\" was expected but \"{actualPropertyName}\" was instead"),
+            Success<string> success when success.Value != expectedPropertyName => 
+                Result.Failure<string>($"\"{expectedPropertyName}\" was expected but \"{success.Value}\" was instead"),
             var result => result
         };
 
@@ -98,21 +101,21 @@ namespace Pevac
 
         public static Parser<Func<T, T>> FailedUpdater<T>() => Parser.Failure<Func<T, T>>();
 
-        private static Parser<T> Parse<T>(Parser<None> parser, Get<T> get) => (ref Utf8JsonReader reader, JsonSerializerOptions options) => parser(ref reader, options) switch
+        private static Parser<T> Parse<T>(Parser<Void> parser, Get<T> get) => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser(ref reader, options) switch
         {
-            var result when result.IsFailure(out var message) => Result.Failure<T>(message),
-            var result when result.IsSuccess(out var _) => Result.Success(get(ref reader)),
+            Failure<Void> failure => Result.Failure<T>(failure.Message),
+            Success<Void> => Result.Success(get(ref reader, options)),
             _ => throw new WhatAFuckException()
         };
 
-        private static Parser<T> TryParse<T>(Parser<None> parser, TryGet<T> tryGet) => (ref Utf8JsonReader reader, JsonSerializerOptions options) => parser(ref reader, options) switch
+        private static Parser<T> TryParse<T>(Parser<Void> parser, TryGet<T> tryGet) => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser(ref reader, options) switch
         {
-            var result when result.IsFailure(out var message) => Result.Failure<T>(message),
-            var result when result.IsSuccess(out var _) && tryGet(ref reader, out T item) => Result.Success<T>(item),
+            Failure<Void> failure => Result.Failure<T>(failure.Message),
+            Success<Void> success when tryGet(ref reader, out T item) => Result.Success<T>(item),
             _ => Result.Failure<T>($"Cannot get a token from \"{reader.GetString()}\"")
         };
 
-        private delegate bool TryGet<T>(ref Utf8JsonReader reader, out T value, JsonSerializerOptions options = default);
-        private delegate T Get<T>(ref Utf8JsonReader reader, JsonSerializerOptions options = default);
+        private delegate bool TryGet<T>(ref Utf8JsonReader reader, out T value, JsonSerializerOptions? options = default);
+        private delegate T Get<T>(ref Utf8JsonReader reader, JsonSerializerOptions? options = default);
     }
 }
