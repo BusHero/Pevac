@@ -47,7 +47,7 @@ namespace Pevac
             (_, _, null) => throw new ArgumentNullException(nameof(failure)),
             (Success<T?> _success, _, _) => success(_success.Value),
             (Failure<T?> _failure, _, _) => failure(_failure.Message),
-            _ => throw new WhatAFuckException("You shouldn't see this"),
+            _ => throw new ParseException("You shouldn't see this"),
         };
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Pevac
             (_, null) => throw new ArgumentNullException(nameof(alternative)),
             (Success<T?> _sucess, _) => _sucess.Value,
             (Failure<T?> _failure, _) => alternative(_failure.Message),
-            _ => throw new WhatAFuckException("You shouldn't see this"),
+            _ => throw new ParseException("You shouldn't see this"),
         };
 
 
@@ -99,7 +99,7 @@ namespace Pevac
             (_, null) => throw new ArgumentNullException(nameof(next)),
             (Success<T?> success, _) => next(success.Value),
             (Failure<T?> failure, _) => Failure<U>(failure.Message),
-            _ => throw new WhatAFuckException("You shouldn't see this")
+            _ => throw new ParseException("You shouldn't see this")
         };
     }
 }
