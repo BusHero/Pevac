@@ -5,6 +5,8 @@ using System.Text.Json;
 
 namespace Pevac
 {
+
+
     public static partial class Parser
     {
         /// <summary>
@@ -22,7 +24,7 @@ namespace Pevac
             _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => first(ref reader, options) switch
             {
                 Success<T> success => second(success.Value)(ref reader, options),
-                Failure<T> failure => Result.Failure<U>(failure.Message),
+                Failure<T> failure => failure.Repack<U?>(),
                 _ => throw new ParseException()
             }
         };

@@ -293,12 +293,12 @@
             
             </summary>
         </member>
-        <member name="P:Pevac.Parser.OptionalString">
+        <member name="M:Pevac.Parser.OptionalString(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
             <summary>
             Parse an optional <see cref="T:System.String"/> value.
             </summary>
         </member>
-        <member name="P:Pevac.Parser.OptionalBool">
+        <member name="M:Pevac.Parser.OptionalBool(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
             <summary>
             Parse a nullable <see cref="T:System.Boolean"/> value.
             </summary>
@@ -423,7 +423,7 @@
             or <see cref="F:System.Text.Json.JsonTokenType.False"/> tokens.
             </summary>
         </member>
-        <member name="P:Pevac.Parser.OptionalBoolToken">
+        <member name="M:Pevac.Parser.OptionalBoolToken(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.True"/> 
             or <see cref="F:System.Text.Json.JsonTokenType.False"/> 
@@ -602,6 +602,11 @@
             Represents a failed result.
             </summary>
             <typeparam name="T">The type of the result.</typeparam>
+        </member>
+        <member name="M:Pevac.Failure`1.Repack``1">
+            <summary>
+            Repack the failure.
+            </summary>
         </member>
     </members>
 </doc>

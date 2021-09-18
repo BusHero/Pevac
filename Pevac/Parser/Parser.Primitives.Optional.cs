@@ -3,26 +3,39 @@ using System.Text.Json;
 
 namespace Pevac
 {
+    
+
     public static partial class Parser
     {
         /// <summary>
         /// Parse an optional <see cref="string"/> value.
         /// </summary>
-        public static Parser<string?> OptionalString { get; } = OptionalStringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
+        public static Result<string?> OptionalString(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+        {
+            return TryParse(OptionalStringToken, ref reader, options) switch
             {
-                return Result.Success(reader.GetString());
-            });
+                Success<Void> => Result.Success(reader.GetString()),
+                Failure<Void> failure => failure.Repack<string?>(),
+                _ => throw new ParseException(),
+            };
+        }
 
         /// <summary>
         /// Parse a nullable <see cref="bool"/> value.
         /// </summary>
-        public static Parser<bool?> OptionalBool { get; } = OptionalBoolToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TokenType switch
+        public static Result<bool?> OptionalBool(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+        {
+            return TryParse(OptionalBoolToken, ref reader, options) switch
             {
-                JsonTokenType.Null => Result.Success(default(bool?)),
-                _ => Result.Success<bool?>(reader.GetBoolean()),
-            });
+                Success<Void> => reader.TokenType switch
+                {
+                    JsonTokenType.Null => Result.Success(default(bool?)),
+                    _ => Result.Success<bool?>(reader.GetBoolean()),
+                },
+                Failure<Void> failure => failure.Repack<bool?>(),
+                _ => throw new ParseException()
+            };
+        }
 
         /// <summary>
         /// Parse an optional <see cref="System.DateTime"/> value.
