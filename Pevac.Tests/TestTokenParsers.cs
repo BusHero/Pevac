@@ -37,10 +37,13 @@ namespace Pevac.Tests
         }
 
         [Theory]
+        [InlineData(@"true", 0, true)]
+        [InlineData(@"false", 0, false)]
+        [InlineData(@"null", 0, null)]
         [InlineData(@"{""foo"": true}", 2, true)]
         [InlineData(@"{""foo"": false}", 2, false)]
         [InlineData(@"{""foo"": null}", 2, null)]
-        public void Bool(string json, int skip, bool? expectedResult)
+        public void OptionalBool_Passes_OnExpectedToken(string json, int skip, bool? expectedResult)
         {
             var reader = GetReader(json, skip);
 
@@ -49,6 +52,8 @@ namespace Pevac.Tests
             Parser.Parse(parser, ref reader, default)
                 .Should().Be(expectedResult);
         }
+
+
 
         [Theory, MemberData(nameof(GuidParsers))]
         public void Guid(string json, int skip, Guid? expectedResult)
