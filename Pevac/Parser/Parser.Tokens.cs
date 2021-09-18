@@ -86,13 +86,32 @@ namespace Pevac
         /// or <see cref="JsonTokenType.False"/> 
         /// or <see cref="JsonTokenType.Null"/> tokens.
         /// </summary>
-        public static Parser<Void> OptionalBoolToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
+        //public static Parser<Void> OptionalBoolToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
+
+
+        public static Result<Void> OptionalBoolToken(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+        {
+            return ParseToken(ref reader, options, JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
+        }
 
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.Null"/> token.
         /// </summary>
         public static Parser<Void> NullToken { get; } = ParseToken(JsonTokenType.Null);
 
-        
+        public static Result<Void> ParseToken(
+            ref Utf8JsonReader reader, 
+            JsonSerializerOptions? options, 
+            params JsonTokenType[] tokens) 
+        {
+            return reader.Read() switch
+            {
+                false => Result.Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
+                true when tokens.Contains(reader.TokenType) => Result.Success(Void.Default),
+                _ => Result.Failure<Void>(""),
+            };
+        }
+
+
     }
 }

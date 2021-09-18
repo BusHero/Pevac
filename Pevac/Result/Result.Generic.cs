@@ -22,5 +22,11 @@ namespace Pevac
     /// Represents a failed result.
     /// </summary>
     /// <typeparam name="T">The type of the result.</typeparam>
-    public record Failure<T>(string Message) : Result<T>;
+    public record Failure<T>(string Message) : Result<T>
+    {
+        /// <summary>
+        /// Repack the failure.
+        /// </summary>
+        public Failure<U> Repack<U>() => new(Message);
+    }
 }
