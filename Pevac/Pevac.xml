@@ -378,43 +378,19 @@
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.String"/> token.
             </summary>
         </member>
-        <member name="P:Pevac.Parser.OptionalStringToken">
-            <summary>
-            Parser for the <see cref="F:System.Text.Json.JsonTokenType.String"/> 
-            or <see cref="F:System.Text.Json.JsonTokenType.None"/> token.
-            </summary>
-        </member>
         <member name="P:Pevac.Parser.NumberToken">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.Number"/> token.
             </summary>
         </member>
-        <member name="P:Pevac.Parser.OptionalNumber">
-            <summary>
-            Parser for the <see cref="F:System.Text.Json.JsonTokenType.Number"/> 
-            or <see cref="F:System.Text.Json.JsonTokenType.Null"/> token.
-            </summary>
-        </member>
-        <member name="M:Pevac.Parser.TrueToken(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
+        <member name="P:Pevac.Parser.TrueToken">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.True"/> token.
-            </summary>
-        </member>
-        <member name="P:Pevac.Parser.OptionalTrueToken">
-            <summary>
-            Parser for the <see cref="F:System.Text.Json.JsonTokenType.True"/> 
-            or <see cref="F:System.Text.Json.JsonTokenType.Null"/> tokens.
             </summary>
         </member>
         <member name="P:Pevac.Parser.FalseToken">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.False"/> token.
-            </summary>
-        </member>
-        <member name="P:Pevac.Parser.OptionalFalseToken">
-            <summary>
-            Parser for the <see cref="F:System.Text.Json.JsonTokenType.False"/> 
-            or <see cref="F:System.Text.Json.JsonTokenType.Null"/> tokens.
             </summary>
         </member>
         <member name="P:Pevac.Parser.BooleanToken">
@@ -423,26 +399,41 @@
             or <see cref="F:System.Text.Json.JsonTokenType.False"/> tokens.
             </summary>
         </member>
+        <member name="P:Pevac.Parser.NullToken">
+            <summary>
+            Parser for the <see cref="F:System.Text.Json.JsonTokenType.Null"/> token.
+            </summary>
+        </member>
+        <member name="P:Pevac.Parser.OptionalStringToken">
+            <summary>
+            Parser for the <see cref="F:System.Text.Json.JsonTokenType.String"/> 
+            or <see cref="F:System.Text.Json.JsonTokenType.None"/> token.
+            </summary>
+        </member>
+        <member name="P:Pevac.Parser.OptionalNumber">
+            <summary>
+            Parser for the <see cref="F:System.Text.Json.JsonTokenType.Number"/> 
+            or <see cref="F:System.Text.Json.JsonTokenType.Null"/> token.
+            </summary>
+        </member>
+        <member name="P:Pevac.Parser.OptionalTrueToken">
+            <summary>
+            Parser for the <see cref="F:System.Text.Json.JsonTokenType.True"/> 
+            or <see cref="F:System.Text.Json.JsonTokenType.Null"/> tokens.
+            </summary>
+        </member>
+        <member name="P:Pevac.Parser.OptionalFalseToken">
+            <summary>
+            Parser for the <see cref="F:System.Text.Json.JsonTokenType.False"/> 
+            or <see cref="F:System.Text.Json.JsonTokenType.Null"/> tokens.
+            </summary>
+        </member>
         <member name="P:Pevac.Parser.OptionalBoolToken">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.True"/> 
             or <see cref="F:System.Text.Json.JsonTokenType.False"/> 
             or <see cref="F:System.Text.Json.JsonTokenType.Null"/> tokens.
             </summary>
-        </member>
-        <member name="P:Pevac.Parser.NullToken">
-            <summary>
-            Parser for the <see cref="F:System.Text.Json.JsonTokenType.Null"/> token.
-            </summary>
-        </member>
-        <member name="M:Pevac.Parser.ParseToken(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions,System.Text.Json.JsonTokenType[])">
-            <summary>
-            Parses a token.
-            </summary>
-            <param name="reader"></param>
-            <param name="options"></param>
-            <param name="tokens"></param>
-            <returns></returns>
         </member>
         <member name="T:Pevac.Parser`1">
             <summary>
