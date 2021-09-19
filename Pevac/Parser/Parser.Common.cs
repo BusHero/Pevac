@@ -38,13 +38,11 @@ namespace Pevac
             try
             {
                 var result = JsonSerializer.Deserialize<T>(ref reader, options);
-                return Result
-                .Success(result);
+                return Result.Success(result);
             }
-            catch (JsonException)
+            catch (JsonException e)
             {
-                return Result
-                .Failure<T>($"Cannot convert json to {typeof(T).Name}");
+                return Result.Failure<T>(e.Message);
             }
         };
         

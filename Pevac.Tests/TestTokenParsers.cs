@@ -73,22 +73,24 @@ namespace Pevac.Tests
                 .Should().Be(expectedResult);
         }
 
-        //[Theory, MemberData(nameof(GuidParsers))]
-        //public void Guid(string json, int skip, Guid? expectedResult)
-        //{
-        //    var reader = GetReader(json, skip);
-        //    Parser.Parse(Parser.OptionalGuid, ref reader, default).Should().Be(expectedResult);
-        //}
+        [Fact]
+        public void Guid()
+        {
+            var guid = System.Guid.NewGuid();
+            var reader = GetReader($"\"{guid}\"", 0);
 
-        //[Theory]
-        //[InlineData(@"{""foo"": ""bar""}", 1, "foo")]
-        //[InlineData(@"{""foo"": ""bar""}", 0, null)]
-        //public void PropertyName(string json, int skip, string expectedResult)
-        //{
-        //    var reader = GetReader(json, skip);
+            Parser.Parse(Parser.OptionalGuid, ref reader, default).Should().Be(guid);
+        }
 
-        //    Parser.Parse(Parser.PropertyName, ref reader, default).Should().Be(expectedResult);
-        //}
+        [Theory]
+        [InlineData(@"{""foo"": ""bar""}", "foo")]
+        [InlineData(@"{""bar"": ""bar""}", "bar")]
+        public void PropertyName(string json, string expectedResult)
+        {
+            var reader = GetReader(json, 1);
+
+            Parser.Parse(Parser.PropertyName, ref reader, default).Should().Be(expectedResult);
+        }
 
         [Theory, MemberData(nameof(TokenParsers))]
         public void Token(Parser<Void> parser, string json, int skip)
@@ -96,18 +98,6 @@ namespace Pevac.Tests
             var reader = GetReader(json, skip);
 
             Parser.Parse(parser, ref reader, default);
-        }
-
-        public static TheoryData<string, int, Guid?> GuidParsers()
-        {
-            var theoryData = new TheoryData<string, int, Guid?>();
-
-            var guid = System.Guid.NewGuid();
-            theoryData.Add($@"{{""foo"" : ""{guid}"" }}", 2, guid);
-            theoryData.Add($@"{{""foo"" : ""invalid-guid"" }}", 2, null);
-            theoryData.Add($@"{{""foo"" : ""invalid-guid"" }}", 1, null);
-            theoryData.Add($@"{{""foo"" : ""invalid-guid"" }}", 0, null);
-            return theoryData;
         }
 
         public static TheoryData<Parser<Void>, string, int> TokenParsers { get; } = new TheoryData<Parser<Void>, string, int>
@@ -125,105 +115,102 @@ namespace Pevac.Tests
             { Parser.NullToken, @"{""foo"": null}", 2},
         };
 
-        //[Fact]
-        //public void Then_Succeds_WithStartAndEndObject()
-        //{
-        //    string json = "{}";
-        //    byte[] bytes = Encoding.UTF8.GetBytes(json);
-        //    Utf8JsonReader reader = new(bytes);
+        [Fact]
+        public void Then_Succeds_WithStartAndEndObject()
+        {
+            string json = "{}";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            Utf8JsonReader reader = new(bytes);
 
-        //    var parser = Parser.StartObjectToken.Then(Parser.EndObjectToken);
+            var parser = Parser.StartObjectToken.Then(Parser.EndObjectToken);
 
-        //    Parser.Parse(parser, ref reader, default);
+            Parser.Parse(parser, ref reader, default);
 
-        //    Assert.Equal(JsonTokenType.EndObject, reader.TokenType);
-        //}
+            Assert.Equal(JsonTokenType.EndObject, reader.TokenType);
+        }
 
-        //[Fact]
-        //public void Then_Succeds_ComplexObject()
-        //{
-        //    string json = @"{""foo"": ""bar""}";
-        //    byte[] bytes = Encoding.UTF8.GetBytes(json);
-        //    Utf8JsonReader reader = new(bytes);
+        [Fact]
+        public void Then_Succeds_ComplexObject()
+        {
+            string json = @"{""foo"": ""bar""}";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            Utf8JsonReader reader = new(bytes);
 
-        //    var parser = Parser.StartObjectToken
-        //        .Then(_ => Parser.PropertyName)
-        //        .Then(propertyName => Parser.String)
-        //        .Then(@string => Parser.EndObjectToken);
+            var parser = Parser.StartObjectToken
+                .Then(_ => Parser.PropertyName)
+                .Then(propertyName => Parser.String)
+                .Then(@string => Parser.EndObjectToken);
 
-        //    bool result = parser(ref reader, default)
-        //        .Match(_ => true, _ => false);
+            bool result = parser(ref reader, default)
+                .Match(_ => true, _ => false);
 
-        //    Assert.Equal(JsonTokenType.EndObject, reader.TokenType);
-        //    Assert.True(result);
-        //}
+            Assert.Equal(JsonTokenType.EndObject, reader.TokenType);
+            Assert.True(result);
+        }
 
-        //[Fact]
-        //public void Select_Succeds()
-        //{
-        //    string json = @"{""foo"": ""bar""}";
-        //    byte[] bytes = Encoding.UTF8.GetBytes(json);
-        //    Utf8JsonReader reader = new(bytes);
+        [Fact]
+        public void Select_Succeds()
+        {
+            string json = @"{""foo"": ""bar""}";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            Utf8JsonReader reader = new(bytes);
 
-        //    var parser = Parser.StartObjectToken
-        //        .Then(_ => Parser.PropertyName)
-        //        .Then(propertyName => Parser.String)
-        //        .Select(asd => new Data(asd));
+            var parser = Parser.StartObjectToken
+                .Then(_ => Parser.PropertyName)
+                .Then(propertyName => Parser.String)
+                .Select(asd => new Data(asd));
 
-        //    var actualResult = parser(ref reader, default).IfFailure(default(Data));
-        //    Assert.NotNull(actualResult);
-        //}
+            var actualResult = parser(ref reader, default).IfFailure(default(Data));
+            Assert.NotNull(actualResult);
+        }
 
-        //[Fact]
-        //public void Then_Fails_WithStartAndEndArray()
-        //{
-        //    string json = "[]";
-        //    byte[] bytes = Encoding.UTF8.GetBytes(json);
-        //    Utf8JsonReader reader = new(bytes);
+        [Fact]
+        public void Then_Fails_WithStartAndEndArray()
+        {
+            string json = "[]";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            Utf8JsonReader reader = new(bytes);
 
-        //    var parser = Parser.StartObjectToken.Then(_ => Parser.EndObjectToken);
-        //    bool result = parser(ref reader, default)
-        //        .Match(_ => true, _ => false);
-        //    Assert.Equal(JsonTokenType.StartArray, reader.TokenType);
-        //    Assert.False(result);
-        //}
+            var parser = Parser.StartObjectToken.Then(_ => Parser.EndObjectToken);
 
-        //[Fact]
-        //public void LinqTests()
-        //{
-        //    string json = @"{""foo"": ""bar""}";
-        //    byte[] bytes = Encoding.UTF8.GetBytes(json);
-        //    Utf8JsonReader reader = new(bytes);
+            Parser.TryParse(parser, ref reader, default).Should().BeOfType<Failure<Void>>();
+        }
 
-        //    var parser = from _ in Parser.StartObjectToken
-        //                 from __ in Parser.PropertyNameToken
-        //                 from value in Parser.String
-        //                 from ___ in Parser.EndObjectToken
-        //                 select new Data(value);
+        [Fact]
+        public void LinqTests()
+        {
+            string json = @"{""foo"": ""bar""}";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            Utf8JsonReader reader = new(bytes);
 
-        //    var result = Parser.Parse(parser, ref reader, default);
-        //    result.Should().BeOfType<Success<Data>>().Which.Value.Should().Be("bar");
-        //}
+            var parser = from _ in Parser.StartObjectToken
+                         from __ in Parser.PropertyNameToken
+                         from value in Parser.String
+                         from ___ in Parser.EndObjectToken
+                         select new Data(value);
 
-        //[Fact]
-        //public void PropertyName_Succeds_RightPropertyName()
-        //{
-        //    string json = @"{""foo"": ""bar""}";
-        //    byte[] bytes = Encoding.UTF8.GetBytes(json);
-        //    Utf8JsonReader reader = new(bytes);
+            Parser.Parse(parser, ref reader, default).foo.Should().Be("bar");
+        }
 
-        //    var parser = from _ in Parser.StartObjectToken
-        //                 from __ in Parser.ParsePropertyName("foo")
-        //                 from value in Parser.String
-        //                 from ___ in Parser.EndObjectToken
-        //                 select new Data(value);
-            
-        //    Parser.Parse(parser, ref reader, default)
-        //        .Should().BeOfType<Success<Data>>()
-        //        .Which.Value.Should().Be("bar");
-        //}
+        [Fact]
+        public void PropertyName_Succeds_RightPropertyName()
+        {
+            string json = @"{""foo"": ""bar""}";
+            byte[] bytes = Encoding.UTF8.GetBytes(json);
+            Utf8JsonReader reader = new(bytes);
 
-        //[Fact]
+            var parser = from _ in Parser.StartObjectToken
+                         from __ in Parser.ParsePropertyName("foo")
+                         from value in Parser.String
+                         from ___ in Parser.EndObjectToken
+                         select new Data(value);
+
+            Parser.TryParse(parser, ref reader, default)
+                .Should().BeOfType<Success<Data>>()
+                .Which.Value.foo.Should().Be("bar");
+        }
+
+        [Fact]
         public void ParseObject_Succeds_OnValidJson()
         {
             string json = @"{""foo"": ""bar""}";
@@ -232,11 +219,10 @@ namespace Pevac.Tests
 
             Parser<Data> parser = Parser.ParseType<Data>();
 
-            Parser.Parse(parser, ref reader, default).Should().BeOfType<Success<Data>>()
-                .Which.Value.Should().Match<Data>(foo => foo.Foo == "bar");
+            Parser.Parse(parser, ref reader, default).foo.Should().Be("bar");
         }
 
-        //[Fact]
+        [Fact]
         public void ParseString_Succeds_ValidJson()
         {
             string json = @"{""foo"": ""bar""}";
@@ -246,11 +232,10 @@ namespace Pevac.Tests
 
             Parser<string> parser = Parser.ParseString(expectedData);
 
-            Parser.Parse(parser, ref reader, default).Should().BeOfType<Success<string>>()
-                .Which.Value.Should().Be("bar");
+            Parser.Parse(parser, ref reader, default).Should().Be("bar");
         }
 
-        //[Fact]
+        [Fact]
         public void ParseString_Fails_InvalidJson()
         {
             var reader = GetReader(@"{""foo"": ""foo""}", 2);
@@ -258,7 +243,7 @@ namespace Pevac.Tests
 
             Parser<string> parser = Parser.ParseString("bar");
 
-            Parser.Parse(parser, ref reader, default).Should().BeOfType<Failure<string>>();
+            Parser.TryParse(parser, ref reader, default).Should().BeOfType<Failure<string>>();
         }
 
         [Theory]
@@ -286,5 +271,5 @@ namespace Pevac.Tests
         }
     }
 
-    public record Data(string Foo);
+    public record Data(string foo);
 }
