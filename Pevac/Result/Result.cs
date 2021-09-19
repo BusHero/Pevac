@@ -7,6 +7,7 @@ namespace Pevac
     /// Provides a set of static methods to simplify the interaction with the <see cref="Result{T}"/> class.
     /// </summary>
     public static partial class Result
+                
     {
         /// <summary>
         /// Generates a failed <see cref="Result{T}"/> with the message specified by the <paramref name="message"/>.

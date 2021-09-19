@@ -13,7 +13,8 @@ namespace Pevac
         public static Parser<string?> ParsePropertyName(string expectedPropertyName) => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => PropertyName(ref reader, options) switch
         {
             Success<string> success when success.Value != expectedPropertyName =>
-                Result.Failure<string>($"\"{expectedPropertyName}\" was expected but \"{success.Value}\" was instead"),
+                Result
+                .Failure<string>($"\"{expectedPropertyName}\" was expected but \"{success.Value}\" was instead"),
             var result => result
         };
 

@@ -3,6 +3,7 @@
 namespace Pevac
 {
     public static partial class Result
+                
     {
         /// <summary>
         /// Specifies a transform function that will be invoked if the result is succesful. It's a part of the fluent interface. 

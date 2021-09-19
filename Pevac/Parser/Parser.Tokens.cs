@@ -6,16 +6,25 @@ namespace Pevac
 {
     public static partial class Parser
     {
+        private static Parser<Void>? optionalBoolToken;
+        private static Parser<Void>? startObjectToken;
+        private static Parser<Void>? booleanToken;
+        private static Parser<Void>? endObjectToken ;
+
         /// <summary>
         /// Parser for <see cref="JsonTokenType.StartObject"/> token.
         /// </summary>
-        public static Parser<Void> StartObjectToken { get; } = ParseToken(JsonTokenType.StartObject);
-        
+        public static Parser<Void> StartObjectToken => startObjectToken ??= ParseToken(JsonTokenType.StartObject);
+
+        //public static Result<Void> StartObjectToken(ref Utf8JsonReader reader, JsonSerializerOptions? options)
+        //{
+        //    return ParseToken(ref reader, options, JsonTokenType.StartObject);
+        //}
+
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.EndObject"/> token.
         /// </summary>
-        public static Parser<Void> EndObjectToken { get; } = ParseToken(JsonTokenType.EndObject);
-
+        public static Parser<Void> EndObjectToken => endObjectToken ??= ParseToken(JsonTokenType.EndObject);
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.StartArray"/> token.
         /// </summary>
@@ -56,7 +65,10 @@ namespace Pevac
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.True"/> token.
         /// </summary>
-        public static Parser<Void> TrueToken { get; } = ParseToken(JsonTokenType.True);
+        public static Result<Void> TrueToken(ref Utf8JsonReader reader, JsonSerializerOptions? options = default)
+        {
+            return ParseToken(ref reader, options, JsonTokenType.True);
+        }
 
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.True"/> 
@@ -75,40 +87,48 @@ namespace Pevac
         /// </summary>
         public static Parser<Void> OptionalFalseToken { get; } = ParseToken(JsonTokenType.False, JsonTokenType.Null);
 
+        
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.True"/> 
         /// or <see cref="JsonTokenType.False"/> tokens.
         /// </summary>
-        public static Parser<Void> BooleanToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False);
+        public static Parser<Void> BooleanToken => booleanToken ??= ParseToken(JsonTokenType.True, JsonTokenType.False);
 
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.True"/> 
         /// or <see cref="JsonTokenType.False"/> 
         /// or <see cref="JsonTokenType.Null"/> tokens.
         /// </summary>
-        //public static Parser<Void> OptionalBoolToken { get; } = ParseToken(JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
+        public static Parser<Void> OptionalBoolToken => optionalBoolToken ??= ParseToken(JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
 
+        //= ParseToken(JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
 
-        public static Result<Void> OptionalBoolToken(ref Utf8JsonReader reader, JsonSerializerOptions? options)
-        {
-            return ParseToken(ref reader, options, JsonTokenType.True, JsonTokenType.False, JsonTokenType.Null);
-        }
 
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.Null"/> token.
         /// </summary>
         public static Parser<Void> NullToken { get; } = ParseToken(JsonTokenType.Null);
 
+        /// <summary>
+        /// Parses a token.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="options"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
         public static Result<Void> ParseToken(
-            ref Utf8JsonReader reader, 
-            JsonSerializerOptions? options, 
-            params JsonTokenType[] tokens) 
+            ref Utf8JsonReader reader,
+            JsonSerializerOptions? options,
+            params JsonTokenType[] tokens)
         {
             return reader.Read() switch
             {
-                false => Result.Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
-                true when tokens.Contains(reader.TokenType) => Result.Success(Void.Default),
-                _ => Result.Failure<Void>(""),
+                false => Result
+                .Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
+                true when tokens.Contains(reader.TokenType) => Result
+                .Success(Void.Default),
+                _ => Result
+                .Failure<Void>(""),
             };
         }
 

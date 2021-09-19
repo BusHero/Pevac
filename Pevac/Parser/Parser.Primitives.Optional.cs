@@ -3,44 +3,39 @@ using System.Text.Json;
 
 namespace Pevac
 {
-    
+
 
     public static partial class Parser
     {
+        private static Parser<DateTime?>? optionalDateTime;
+        private static Parser<Uri?>? optionalUri;
+        private static Parser<Guid?>? optionalGuid;
+        private static Parser<string?>? optionalString;
+        private static Parser<bool?>? optionalBool;
+
         /// <summary>
         /// Parse an optional <see cref="string"/> value.
         /// </summary>
-        public static Result<string?> OptionalString(ref Utf8JsonReader reader, JsonSerializerOptions? options)
-        {
-            return TryParse(OptionalStringToken, ref reader, options) switch
+        public static Parser<string?> OptionalString => optionalString ??= OptionalStringToken
+            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
             {
-                Success<Void> => Result.Success(reader.GetString()),
-                Failure<Void> failure => failure.Repack<string?>(),
-                _ => throw new ParseException(),
-            };
-        }
+                return Result.Success(reader.GetString());
+            });
 
         /// <summary>
         /// Parse a nullable <see cref="bool"/> value.
         /// </summary>
-        public static Result<bool?> OptionalBool(ref Utf8JsonReader reader, JsonSerializerOptions? options)
-        {
-            return TryParse(OptionalBoolToken, ref reader, options) switch
+        public static Parser<bool?> OptionalBool => optionalBool ??= OptionalBoolToken
+            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TokenType switch
             {
-                Success<Void> => reader.TokenType switch
-                {
-                    JsonTokenType.Null => Result.Success(default(bool?)),
-                    _ => Result.Success<bool?>(reader.GetBoolean()),
-                },
-                Failure<Void> failure => failure.Repack<bool?>(),
-                _ => throw new ParseException()
-            };
-        }
+                JsonTokenType.Null => Result.Success(default(bool?)),
+                _ => Result.Success<bool?>(reader.GetBoolean()),
+            });
 
         /// <summary>
         /// Parse an optional <see cref="System.DateTime"/> value.
         /// </summary>
-        public static Parser<DateTime?> OptionalDateTime { get; } = OptionalStringToken
+        public static Parser<DateTime?> OptionalDateTime => optionalDateTime ??= OptionalStringToken
             .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetNullableDateTime(out var dateTime) switch
             {
                 true => Result.Success(dateTime),
@@ -50,7 +45,7 @@ namespace Pevac
         /// <summary>
         /// Parse an optional <see cref="System.Uri"/> value.
         /// </summary>
-        public static Parser<System.Uri?> OptionalUri { get; } = OptionalStringToken
+        public static Parser<System.Uri?> OptionalUri => optionalUri ??= OptionalStringToken
             .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUri(UriKind.RelativeOrAbsolute, out var uri) switch
             {
                 true => Result.Success(uri),
@@ -60,7 +55,7 @@ namespace Pevac
         /// <summary>
         /// Parse a nullable <see cref="Guid"/> value.
         /// </summary>
-        public static Parser<Guid?> OptionalGuid { get; } = OptionalStringToken
+        public static Parser<Guid?> OptionalGuid => optionalGuid ??= OptionalStringToken
             .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetNullableGuid(out var guid) switch
             {
                 true => Result.Success(guid),

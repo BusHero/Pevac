@@ -50,7 +50,8 @@ namespace Pevac
         /// <typeparam name="T"></typeparam>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static Parser<T?> Failure<T>(string message = "some default message") => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result.Failure<T>(message);
+        public static Parser<T?> Failure<T>(string message = "some default message") => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result
+                .Failure<T>(message);
 
         /// <summary>
         /// 
@@ -58,7 +59,8 @@ namespace Pevac
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Parser<T?> Return<T>(T? value) => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result.Success(value);
+        public static Parser<T?> Return<T>(T? value) => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result
+                .Success(value);
 
         /// <summary>
         /// 

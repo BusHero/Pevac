@@ -44,7 +44,8 @@ namespace Pevac
             _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => first(ref reader, options) switch
             {
                 Success<T> success => second(ref reader, options),
-                Failure<T> failure => Result.Failure<U>(failure.Message),
+                Failure<T> failure => Result
+                .Failure<U>(failure.Message),
                 _ => throw new ParseException()
             }
         };
@@ -92,7 +93,8 @@ namespace Pevac
                     list.Add(success.Value);
                     reader = nextReader;
                 }
-                return Result.Success(list.AsEnumerable());
+                return Result
+                .Success(list.AsEnumerable());
             }
         };
     }

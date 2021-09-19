@@ -290,15 +290,15 @@
         </member>
         <member name="P:Pevac.Parser.EmptyObject">
             <summary>
-            
+            Parses an empty object.
             </summary>
         </member>
-        <member name="M:Pevac.Parser.OptionalString(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
+        <member name="P:Pevac.Parser.OptionalString">
             <summary>
             Parse an optional <see cref="T:System.String"/> value.
             </summary>
         </member>
-        <member name="M:Pevac.Parser.OptionalBool(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
+        <member name="P:Pevac.Parser.OptionalBool">
             <summary>
             Parse a nullable <see cref="T:System.Boolean"/> value.
             </summary>
@@ -395,7 +395,7 @@
             or <see cref="F:System.Text.Json.JsonTokenType.Null"/> token.
             </summary>
         </member>
-        <member name="P:Pevac.Parser.TrueToken">
+        <member name="M:Pevac.Parser.TrueToken(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.True"/> token.
             </summary>
@@ -423,7 +423,7 @@
             or <see cref="F:System.Text.Json.JsonTokenType.False"/> tokens.
             </summary>
         </member>
-        <member name="M:Pevac.Parser.OptionalBoolToken(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
+        <member name="P:Pevac.Parser.OptionalBoolToken">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.True"/> 
             or <see cref="F:System.Text.Json.JsonTokenType.False"/> 
@@ -434,6 +434,15 @@
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.Null"/> token.
             </summary>
+        </member>
+        <member name="M:Pevac.Parser.ParseToken(System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions,System.Text.Json.JsonTokenType[])">
+            <summary>
+            Parses a token.
+            </summary>
+            <param name="reader"></param>
+            <param name="options"></param>
+            <param name="tokens"></param>
+            <returns></returns>
         </member>
         <member name="T:Pevac.Parser`1">
             <summary>

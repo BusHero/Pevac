@@ -11,7 +11,7 @@ namespace Pevac
     {
         internal Result() { }
     }
-
+    
     /// <summary>
     /// Represents a succesfull result.
     /// </summary>

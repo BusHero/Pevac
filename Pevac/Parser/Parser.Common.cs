@@ -18,9 +18,12 @@ namespace Pevac
         {
             return reader.Read() switch
             {
-                false => Result.Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
-                true when tokens.Contains(reader.TokenType) => Result.Success(Void.Default),
-                _ => Result.Failure<Void>(""),
+                false => Result
+                .Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
+                true when tokens.Contains(reader.TokenType) => Result
+                .Success(Void.Default),
+                _ => Result
+                .Failure<Void>(""),
             };
         };
 
@@ -35,11 +38,13 @@ namespace Pevac
             try
             {
                 var result = JsonSerializer.Deserialize<T>(ref reader, options);
-                return Result.Success(result);
+                return Result
+                .Success(result);
             }
             catch (JsonException)
             {
-                return Result.Failure<T>($"Cannot convert json to {typeof(T).Name}");
+                return Result
+                .Failure<T>($"Cannot convert json to {typeof(T).Name}");
             }
         };
         
@@ -53,7 +58,8 @@ namespace Pevac
             return String(ref reader, options) switch
             {
                 Success<string?> success when !expectedValue.Contains(success.Value) =>
-                    Result.Failure<string>($"\"{expectedValue}\" was expected, but \"{success.Value}\" recieved"),
+                    Result
+                .Failure<string>($"\"{expectedValue}\" was expected, but \"{success.Value}\" recieved"),
                 var result => result
             };
         };
