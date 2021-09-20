@@ -271,5 +271,7 @@ namespace Pevac.Tests
         }
     }
 
+#pragma warning disable IDE1006 // Naming Styles
     public record Data(string foo);
+#pragma warning restore IDE1006 // Naming Styles
 }

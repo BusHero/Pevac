@@ -15,6 +15,7 @@
     <PackageTags>System.Text.Json, ParserCombinator, Utf8JsonReader, parser</PackageTags>
     <PackageReleaseNotes>This is a prerelease version</PackageReleaseNotes>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
