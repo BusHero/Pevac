@@ -12,8 +12,8 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/BusHero/Pevac</PackageProjectUrl>
     <RepositoryUrl>https://github.com/BusHero/Pevac</RepositoryUrl>
-    <PackageTags>System.Text.Json ParserCombinator Utf8JsonReader</PackageTags>
-    <PackageReleaseNotes>This is the prerelease</PackageReleaseNotes>
+    <PackageTags>System.Text.Json, ParserCombinator, Utf8JsonReader, parser</PackageTags>
+    <PackageReleaseNotes>This is a prerelease version</PackageReleaseNotes>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
