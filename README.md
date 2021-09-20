@@ -20,11 +20,11 @@ Unlike most parser-building frameworks, you use [Pevac](#pevac) directly from yo
 [Pevac](#pevac) provides a number of build-in functions that can make bigger parsers from smaller once, often callable via Linq query comprehensions:
 
 ```csharp
-Parser<string> parser = from _ in Parser.StartObject
-                        from propertyName in Parser.PropertyName
-                        from value in Parser.String
-                        from __ in Parser.EndObject
-                        select new Foo(propertyName, value)
+Parser<Foo> parser = from _ in Parser.StartObject
+                     from propertyName in Parser.PropertyName
+                     from value in Parser.String
+                     from __ in Parser.EndObject
+                     select new Foo(propertyName, value)
 
 var json = "{ \"foo\" : \"bar\" }";
 var bytes = Encoding.UTF8.GetBytes(foo);
