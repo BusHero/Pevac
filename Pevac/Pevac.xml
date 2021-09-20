@@ -156,6 +156,13 @@
             <param name="predicate"></param>
             <returns></returns>
         </member>
+        <member name="M:Pevac.Parser.ParseObject``1(System.Func{System.String,Pevac.Parser{System.Func{``0,``0}}})">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
         <member name="M:Pevac.Parser.Then``2(Pevac.Parser{``0},System.Func{``0,Pevac.Parser{``1}})">
             <summary>
             Parse first, and if successful, then parse the second.
