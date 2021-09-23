@@ -15,7 +15,7 @@ namespace Pevac
         /// <param name="selector">A transform function to apply to the value of parser.</param>
         /// <returns>A Parser whose result is the result of invokiung the transform function on the result of <paramref name="source"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="selector"/> is null.</exception>
-        public static Parser<TResult?> Select<TSource, TResult>(this Parser<TSource?> source, Func<TSource?, TResult?> selector) => (source, selector) switch
+        public static Parser<TResult> Select<TSource, TResult>(this Parser<TSource> source, Func<TSource, TResult> selector) => (source, selector) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(source)),
             (_, null) => throw new ArgumentNullException(nameof(selector)),
@@ -32,7 +32,7 @@ namespace Pevac
         /// <param name="selector"></param>
         /// <param name="projector"></param>
         /// <returns></returns>
-        public static Parser<V?> SelectMany<T, U, V>(this Parser<T?> parser, Func<T?, Parser<U?>> selector, Func<T?, U?, V?> projector) => (parser, selector, projector) switch
+        public static Parser<V> SelectMany<T, U, V>(this Parser<T> parser, Func<T, Parser<U>> selector, Func<T, U, V> projector) => (parser, selector, projector) switch
         {
             (null, _, _) => throw new ArgumentNullException(nameof(parser)),
             (_, null, _) => throw new ArgumentNullException(nameof(selector)),

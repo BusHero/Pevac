@@ -12,7 +12,7 @@ namespace Pevac
         private static Parser<long>? int64;
         private static Parser<sbyte>? sByte;
         private static Parser<float>? single;
-        private static Parser<string?>? propertyName;
+        private static Parser<string>? propertyName;
         private static Parser<ulong>? uInt64;
         private static Parser<uint>? uInt32;
         private static Parser<ushort>? uInt16;
@@ -89,10 +89,8 @@ namespace Pevac
         public static Parser<DateTime> DateTime => dateTime ??= OptionalStringToken
             .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTime(out var value) switch
             {
-                true => Result
-                .Success(value),
-                false => Result
-                .Failure<DateTime>()
+                true => Result.Success(value),
+                false => Result.Failure<DateTime>()
             });
 
         /// <summary>
@@ -101,10 +99,8 @@ namespace Pevac
         public static Parser<DateTimeOffset> DateTimeOffset => dateTimeOffset ??= StringToken
             .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTimeOffset(out var value) switch
             {
-                true => Result
-                .Success(value),
-                false => Result
-                .Failure<DateTimeOffset>()
+                true => Result.Success(value),
+                false => Result.Failure<DateTimeOffset>()
             });
 
         /// <summary>
@@ -210,10 +206,11 @@ namespace Pevac
         /// <summary>
         /// Parse a property name value.
         /// </summary>
-        public static Parser<string?> PropertyName => propertyName ??= PropertyNameToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
+        public static Parser<string> PropertyName => propertyName ??= PropertyNameToken
+            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString() switch
             {
-                return Result.Success(reader.GetString());
+                null => throw new ParseException(),
+                string propertyName => Result.Success(propertyName),
             });
 
         /// <summary>
