@@ -3,12 +3,24 @@ using FluentAssertions;
 using System.Text;
 using System.Text.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Pevac.Tests
 {
     public class ObjectDeserializerTests
     {
-        private record Data(string Foo, string Bar);
+        private record Data(string Foo, string Bar)
+        {
+            public string Foo { get; set; } = Foo;
+            public string Bar { get; set; } = Bar;
+        }
+
+        private record SubType(string Foo, string Bar, string Baz): Data(Foo, Bar) 
+        {
+            public string Baz { get; set; } = Baz;
+
+            public static SubType Copy(Data data) => new(data.Foo, data.Bar, "");
+        }
 
         [Fact]
         public void DeserializeObject()
@@ -24,12 +36,10 @@ namespace Pevac.Tests
 
             Parser<Data> parser = Parser.ParseObject(propertyName => propertyName switch
             {
-                "foo" => from value in Parser.String
-                         select new Func<Data, Data>(data => data with { Foo = value }),
-                "bar" => from value in Parser.String
-                         select new Func<Data, Data>(data => data with { Bar = value }),
+                "foo" => Parser.String.Updater((string foo, Data data) => data with { Foo = foo }),
+                "bar" => Parser.String.Updater((string bar, Data data) => data.Bar = bar),
                 _ => Parser.Failure<Func<Data, Data>>()
-            }).Select(updater => updater(new Data("", "")));
+            }, new Data("", ""));
 
             Parser.Parse(parser, ref reader, default).Should().Be(new Data("foo", "bar"));
         }

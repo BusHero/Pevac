@@ -5,8 +5,6 @@ using System.Text.Json;
 
 namespace Pevac
 {
-
-
     public static partial class Parser
     {
         /// <summary>
@@ -17,14 +15,14 @@ namespace Pevac
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns></returns>
-        public static Parser<U?> Then<T, U>(this Parser<T?> first, Func<T?, Parser<U?>> second) => (first, second) switch
+        public static Parser<U> Then<T, U>(this Parser<T> first, Func<T, Parser<U>> second) => (first, second) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(first)),
             (_, null) => throw new ArgumentNullException(nameof(second)),
             _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => first(ref reader, options) switch
             {
-                Success<T> success => second(success.Value)(ref reader, options),
-                Failure<T> failure => failure.Repack<U?>(),
+                ISuccess<T> success => second(success.Value)(ref reader, options),
+                IFailure<T> failure => failure.Repack<U>(),
                 _ => throw new ParseException()
             }
         };
@@ -37,15 +35,14 @@ namespace Pevac
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns></returns>
-        public static Parser<U?> Then<T, U>(this Parser<T?> first, Parser<U?> second) => (first, second) switch
+        public static Parser<U> Then<T, U>(this Parser<T> first, Parser<U> second) => (first, second) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(first)),
             (_, null) => throw new ArgumentNullException(nameof(second)),
             _ => (ref Utf8JsonReader reader, JsonSerializerOptions? options) => first(ref reader, options) switch
             {
-                Success<T> success => second(ref reader, options),
-                Failure<T> failure => Result
-                .Failure<U>(failure.Message),
+                ISuccess<T> success => second(ref reader, options),
+                IFailure<T> failure => Result.Failure<U>(failure.Message),
                 _ => throw new ParseException()
             }
         };
@@ -57,7 +54,7 @@ namespace Pevac
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns></returns>
-        public static Parser<T?> Or<T>(this Parser<T?> first, Parser<T?> second) => (first, second) switch
+        public static Parser<T> Or<T>(this Parser<T> first, Parser<T> second) => (first, second) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(first)),
             (_, null) => throw new ArgumentNullException(nameof(second)),
@@ -66,7 +63,7 @@ namespace Pevac
                 var forFirst = reader;
                 switch (first(ref forFirst, options))
                 {
-                    case Success<T?> success:
+                    case ISuccess<T> success:
                         reader = forFirst;
                         return success;
                     default:
@@ -81,14 +78,14 @@ namespace Pevac
         /// <typeparam name="T"></typeparam>
         /// <param name="parser"></param>
         /// <returns></returns>
-        public static Parser<IEnumerable<T?>?> Many<T>(this Parser<T?> parser) => parser switch
+        public static Parser<IEnumerable<T>> Many<T>(this Parser<T> parser) => parser switch
         {
             null => throw new ArgumentNullException(nameof(parser)),
             not null => (ref Utf8JsonReader reader, JsonSerializerOptions? options) =>
             {
-                var list = new List<T?>();
+                var list = new List<T>();
                 var nextReader = reader;
-                while (parser(ref nextReader, options) is Success<T?> success)
+                while (parser(ref nextReader, options) is Success<T> success)
                 {
                     list.Add(success.Value);
                     reader = nextReader;
@@ -97,5 +94,21 @@ namespace Pevac
                 .Success(list.AsEnumerable());
             }
         };
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="Left"></typeparam>
+        /// <typeparam name="Right"></typeparam>
+        /// <param name="parser"></param>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static Parser<T> Between<T, Left, Right>(this Parser<T> parser, Parser<Left> left, Parser<Right> right) =>
+            from _ in left
+            from t in parser
+            from __ in right
+            select t;
     }
 }

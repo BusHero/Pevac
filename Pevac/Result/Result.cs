@@ -15,7 +15,7 @@ namespace Pevac
         /// <typeparam name="T">The type of the resulting <see cref="Result{T}"/>.</typeparam>
         /// <param name="message">The message of the result.</param>
         /// <returns>A result.</returns>
-        public static Result<T?> Failure<T>(string message = "Some default message") => new Failure<T?>(message);
+        public static IResult<T> Failure<T>(string message = "Some default message") => new Failure<T>(message);
 
         /// <summary>
         /// Creates a succesfull <see cref="Result{T}"/> with the <paramref name="value"/> as the result.
@@ -23,7 +23,7 @@ namespace Pevac
         /// <typeparam name="T">The type of the result.</typeparam>
         /// <param name="value">The value of the result.</param>
         /// <returns>A result.</returns>
-        public static Result<T?> Success<T>(T? value) => new Success<T?>(value);
+        public static IResult<T> Success<T>(T value) => new Success<T>(value);
 
         /// <summary>
         /// Matches a result
@@ -41,7 +41,7 @@ namespace Pevac
         ///                               failure: (string message) => "");
         /// </code>
         /// </example>
-        public static U? Match<T, U>(this Result<T?> result, Func<T?, U?> success, Func<string, U?> failure) => (result, success, failure) switch
+        public static U? Match<T, U>(this IResult<T?> result, Func<T?, U?> success, Func<string, U?> failure) => (result, success, failure) switch
         {
             (null, _, _) => throw new ArgumentNullException(nameof(result)),
             (_, null, _) => throw new ArgumentNullException(nameof(success)),
@@ -58,7 +58,7 @@ namespace Pevac
         /// <param name="result">The result.</param>
         /// <param name="alternative">A method that takes as input the error message and returns back an alternative value.</param>
         /// <returns>The value of the result, in case the result is succesfull, otherwise the result of invoking <paramref name="alternative"/> function.</returns>
-        public static T? IfFailure<T>(this Result<T?> result, Func<string, T?> alternative) => (result, alternative) switch
+        public static T? IfFailure<T>(this IResult<T?> result, Func<string, T?> alternative) => (result, alternative) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(result)),
             (_, null) => throw new ArgumentNullException(nameof(alternative)),
@@ -72,7 +72,7 @@ namespace Pevac
         /// <param name="alternative">A method that returns an alternative value.</param>
         /// <inheritdoc cref="IfFailure{T}(Result{T?}, Func{string, T?})"/>
 #pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        public static T? IfFailure<T>(this Result<T?> result, Func<T?> alternative) => IfFailure(result, _ => alternative());
+        public static T? IfFailure<T>(this IResult<T?> result, Func<T?> alternative) => IfFailure(result, _ => alternative());
 #pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
@@ -82,7 +82,7 @@ namespace Pevac
         /// <returns>The value of the result, in case the result is succesful, otherwise the <paramref name="alternative"/>.</returns>
         /// <inheritdoc cref="IfFailure{T}(Result{T?}, Func{string, T?})"/>
 #pragma warning disable CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
-        public static T? IfFailure<T>(this Result<T?> result, T alternative) => result.IfFailure(_ => alternative);
+        public static T? IfFailure<T>(this IResult<T?> result, T alternative) => result.IfFailure(_ => alternative);
 #pragma warning restore CS1573 // Parameter has no matching param tag in the XML comment (but other parameters do)
 #pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
@@ -94,12 +94,12 @@ namespace Pevac
         /// <param name="result"></param>
         /// <param name="next"></param>
         /// <returns></returns>
-        public static Result<U?> IfSuccess<T, U>(this Result<T?> result, Func<T?, Result<U?>> next) => (result, next) switch
+        public static IResult<U?> IfSuccess<T, U>(this IResult<T?> result, Func<T?, IResult<U?>> next) => (result, next) switch
         {
             (null, _) => throw new ArgumentNullException(nameof(result)),
             (_, null) => throw new ArgumentNullException(nameof(next)),
-            (Success<T?> success, _) => next(success.Value),
-            (Failure<T?> failure, _) => Failure<U>(failure.Message),
+            (ISuccess<T?> success, _) => next(success.Value),
+            (IFailure<T?> failure, _) => Failure<U>(failure.Message),
             _ => throw new ParseException("You shouldn't see this")
         };
     }

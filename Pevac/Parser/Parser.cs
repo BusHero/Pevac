@@ -10,7 +10,7 @@ namespace Pevac
     /// <param name="input">The input to the parser.</param>
     /// <param name="options">The options to the parser.</param>
     /// <returns>The result of the parser.</returns>
-    public delegate Result<T> Parser<T>(ref Utf8JsonReader input, JsonSerializerOptions? options = default);
+    public delegate IResult<T> Parser<out T>(ref Utf8JsonReader input, JsonSerializerOptions? options = default);
 
     public static partial class Parser
     {
@@ -22,7 +22,7 @@ namespace Pevac
         /// <param name="reader"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static Result<T?>? TryParse<T>(this Parser<T?> parser, ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser switch
+        public static IResult<T?>? TryParse<T>(this Parser<T?> parser, ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser switch
         {
             null => throw new ArgumentNullException(nameof(parser)),
             not null => parser(ref reader, options),
@@ -59,8 +59,7 @@ namespace Pevac
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Parser<T?> Return<T>(T? value) => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result
-                .Success(value);
+        public static Parser<T> Return<T>(T value) => (ref Utf8JsonReader _, JsonSerializerOptions? _) => Result.Success(value);
 
         /// <summary>
         /// 
