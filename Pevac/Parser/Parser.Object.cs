@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pevac
 {
     public static partial class Parser
     {
         /// <summary>
-        /// 
+        /// Creates an updater.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -19,7 +16,7 @@ namespace Pevac
             select new Func<U, U>(u => func(t, u));
 
         /// <summary>
-        /// 
+        /// Creates an updater.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -35,7 +32,7 @@ namespace Pevac
             });
         
         /// <summary>
-        /// 
+        /// Creates an updater.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -47,7 +44,7 @@ namespace Pevac
             select func;
 
         /// <summary>
-        /// 
+        /// Creates an updater.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -63,7 +60,7 @@ namespace Pevac
             });
 
         /// <summary>
-        /// 
+        /// Creates an identity updater
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -74,60 +71,46 @@ namespace Pevac
             select new Func<U, U>(u => u);
 
         /// <summary>
-        /// 
+        /// Parses an object with fields
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="parserSelector"></param>
         /// <param name="default"></param>
         /// <returns></returns>
-        public static Parser<T> ParseObject<T>(Func<string, Parser<Func<T, T>>> parserSelector, T @default)
+        public static Parser<T> ParseObject<T>(Func<string, Parser<Func<T, T>>> parserSelector, T @default) => parserSelector switch
         {
-            return parserSelector switch
-            {
-                null => throw new ArgumentNullException(nameof(parserSelector)),
-                not null => PropertyName
-                    .SelectMany(propertyName => parserSelector(propertyName), (_, updater) => updater)
-                    .Many()
-                    .Between(StartObjectToken, EndObjectToken)
-                    .Select(updaters => new Func<T, T>(t => updaters.Aggregate(t, (data, updater) => updater(data))))
-                    .Select(updater => updater(@default))
-            };
-        }
+            null => throw new ArgumentNullException(nameof(parserSelector)),
+            not null => from updater in ParseObject(parserSelector)
+                        select updater(@default)
+        };
 
         /// <summary>
-        /// 
+        /// Parses an object with fields
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Parser<Func<T, T>?> ParseObject<T>(Func<string, Parser<Func<T, T>>> parserSelector)
+        public static Parser<Func<T, T>> ParseObject<T>(Func<string, Parser<Func<T, T>>> parserSelector) => parserSelector switch
         {
-            return parserSelector switch
-            {
-                null => throw new ArgumentNullException(nameof(parserSelector)),
-                not null => from _ in StartObjectToken
-                            from updaters in
-                                (from propertyName in PropertyName
-                                 from updater in parserSelector(propertyName)
-                                 select updater).Many()
-                            from __ in EndObjectToken
-                            select new Func<T, T>(t => updaters.Aggregate(t, (data, updater) => updater(data)))
-            };
-        }
+            null => throw new ArgumentNullException(nameof(parserSelector)),
+            not null => PropertyName
+                .SelectMany(propertyName => parserSelector(propertyName), (_, updater) => updater)
+                .Many()
+                .Between(StartObjectToken, EndObjectToken)
+                .Select(updaters => new Func<T, T>(t => updaters.Aggregate(t, (data, updater) => updater(data))))
+        };
 
         /// <summary>
-        /// 
+        /// Parses an object with fields.
         /// </summary>
         /// <typeparam name="TParent"></typeparam>
         /// <typeparam name="TChild"></typeparam>
         /// <param name="parserSelector"></param>
         /// <param name="cast"></param>
         /// <returns></returns>
-        public static Parser<Func<TParent, TParent>?> ParseObject<TParent, TChild>(
+        public static Parser<Func<TParent, TParent>> ParseObject<TParent, TChild>(
             Func<string, Parser<Func<TChild, TChild>>> parserSelector,
             Func<TParent, TChild> cast) where TChild : TParent => 
             from updater in ParseObject(parserSelector)
             select new Func<TParent, TParent>(parent => updater(cast(parent)));
-
-        
     }
 }
