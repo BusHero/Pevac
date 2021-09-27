@@ -1,5 +1,5 @@
 # Pevac ![Some other name that doesn't matter](https://github.com/BusHero/Pevac/actions/workflows/build.yaml/badge.svg)
-Some change here and there
+
 Pevac is a simple, lightweight library for constructing functional, forward only parsers that use [Utf8JsonReader](https://docs.microsoft.com/en-us/dotnet/api/system.text.json.utf8jsonreader) struct as the source of tokens. Parsers can then be used to simplify constuction of custom deserializers for the [System.Text.Json](https://docs.microsoft.com/en-us/dotnet/api/system.text.json). 
 
 It is heavely inspired by the [Sprache](https://github.com/sprache/Sprache) parser combinator library! 
