@@ -19,9 +19,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    - name: Publish Pevac
-      uses: brandedoutcast/publish-nuget@v2.5.2
-      with:
-          PROJECT_FILE_PATH: Pevac/Pevac.csproj
-          NUGET_KEY: ${{secrets.PEVAC_NUGET_PUBLISHER}}
-          VERSION_REGEX: ^\s*<VersionPrefix>(.*)<\/VersionPrefix>\s*$
+    - name: Pack
+      run: dotnet pack -c Release -o out 
+    - name: Publish Nuget to GitHub registry
+      run: dotnet nuget push ./out/*.nupkg -k ${NUGET_TOKEN} -s https://api.nuget.org/v3/index.json 
+      env:
+        NUGET_TOKEN: ${{ secrets.PEVAC_NUGET_PUBLISHER }}
