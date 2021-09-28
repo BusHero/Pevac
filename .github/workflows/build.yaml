@@ -2,6 +2,14 @@ name: build
 
 on: [workflow_dispatch]
 
+env:
+  PROJECT_NAME: Pevac
+  GITHUB_FEED: https://nuget.pkg.github.com/BusHero/index.json 
+  GITHUB_USER: BusHero
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.PEVAC_NUGET_PUBLISHER }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,9 +26,9 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Pack
-      run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID $PROJECT_NAME/$PROJECT_NAME.*proj
-    - name: Upload Artifacts
+      run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID $PROJECT_NAME/$PROJECT_NAME.*proj    
+    - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: nupkg
-        path: ./${{env.PROJECT_NAME}}/bin/Release/*.nupkg
+        path: ./${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
