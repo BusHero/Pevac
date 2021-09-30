@@ -1,4 +1,4 @@
-name: Publish to Nuget.org
+name: Test Workflow
 
 on: [workflow_dispatch]
 # on:
@@ -8,20 +8,26 @@ on: [workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Pack
-      run: dotnet pack -c Release -o out 
-    - name: Publish Nuget to GitHub registry
-      run: dotnet nuget push ./out/*.nupkg -k ${NUGET_TOKEN} -s https://api.nuget.org/v3/index.json 
-      env:
-        NUGET_TOKEN: ${{ secrets.PEVAC_NUGET_PUBLISHER }}
+      - uses: actions/checkout@v2
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Test
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ env.RELEASE_VERSION }}
+#     - uses: actions/checkout@v2
+#     - name: Setup .NET Core
+#       uses: actions/setup-dotnet@v1
+#       with:
+#         dotnet-version: 5.0.x
+#     - name: Install dependencies
+#       run: dotnet restore
+#     - name: Build
+#       run: dotnet build --configuration Release --no-restore
+#     - name: Pack
+#       run: dotnet pack -c Release -o out 
+#     - name: Publish Nuget to GitHub registry
+#       run: dotnet nuget push ./out/*.nupkg -k ${NUGET_TOKEN} -s https://api.nuget.org/v3/index.json 
+#       env:
+#         NUGET_TOKEN: ${{ secrets.PEVAC_NUGET_PUBLISHER }}
