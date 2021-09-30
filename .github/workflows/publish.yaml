@@ -1,4 +1,4 @@
-name: .NET Core
+name: Publish Package
 on:
   workflow_dispatch:
   release:
@@ -20,8 +20,8 @@ env:
   NUGET_FEED: https://api.nuget.org/v3/index.json
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubunt-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -34,16 +34,37 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
       - name: Test
-        run: dotnet test -c Release --no-build
-      - name: Create Release NuGet package
+        run: dotnet test -c Release
+      - name: Pack
         run: |
           arrTag=(${GITHUB_REF//\// })
           VERSION="${arrTag[2]}"
           echo Version: $VERSION
           VERSION="${VERSION//v}"
           echo Clean Version: $VERSION
-          dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.*proj
+          dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$VERSION src/$PROJECT_NAME/$PROJECT_NAME.*proj
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nupkg
+          path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
+  deploy-GitHub:
+    needs: build
+    runs-on: ubunt-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: nupkg
       - name: Push to GitHub Feed
-        run: dotnet nuget push ./nupkg/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_TOKEN
-      - name: Push to NuGet Feed
-        run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
+        run: dotnet nuget push ./nupkg/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_TOKEN  
+#   deploy-NuGet:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Download Artifact
+#         uses: actions/download-artifact@v1
+#         with:
+#           name: nupkg
+#       - name: Push to NuGet
+#         run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
