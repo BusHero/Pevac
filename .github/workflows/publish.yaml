@@ -1,53 +1,40 @@
-name: Publish to GitHub Package Repository
-
-on: [workflow_dispatch]
-
+name: .NET Core
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - published
+env:
+  # Stop wasting time caching packages
+  DOTNET_VERSION: 5.0.*
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # Project name to pack and publish
+  PROJECT_NAME: Pevac
+  # GitHub Packages Feed settings
+  GITHUB_FEED: https://nuget.pkg.github.com/BusHero/index.json
+  GITHUB_USER: BusHero
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Official NuGet Feed settings
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+  NUGET_KEY: ${{ secrets.NUGET_KEY }}
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build -c Release --no-restore
-    - name: Test
-      run: dotnet test -c Release --no-build --verbosity normal
-    - name: Pack
-      run: dotnet pack -c Release -o out --version-suffix ${GITHUB_RUN_NUMBER}
-    - name: Publish Nuget to GitHub registry
-      run: dotnet nuget push ./out/*.nupkg -k ${GITHUB_TOKEN} -s https://nuget.pkg.github.com/BusHero/index.json 
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  prerelease:
-     needs: build
-     if: github.ref == 'refs/heads/develop'
-     runs-on: ubuntu-latest
-     steps:
-       - name: Download Artifact
-         uses: actions/download-artifact@v1
-         with:
-           name: nupkg
-       - name: Push to GitHub Feed
-         run: |
-           for f in ./nupkg/*.nupkg
-           do
-             curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
-           done
   deploy:
-    needs: build
-    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.301
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Test
+        run: dotnet test -c Release --no-build
       - name: Create Release NuGet package
         run: |
           arrTag=(${GITHUB_REF//\// })
@@ -55,14 +42,8 @@ jobs:
           echo Version: $VERSION
           VERSION="${VERSION//v}"
           echo Clean Version: $VERSION
-          dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg $PROJECT_NAME/$PROJECT_NAME.*proj
+          dotnet pack -v normal -c Release --no-restore --no-build --include-symbols --include-source -p:PackageVersion=$VERSION -o nupkg src/$PROJECT_NAME/$PROJECT_NAME.*proj
       - name: Push to GitHub Feed
-        run: |
-          for f in ./nupkg/*.nupkg
-          do
-            curl -vX PUT -u "$GITHUB_USER:$GITHUB_TOKEN" -F package=@$f $GITHUB_FEED
-          done
+        run: dotnet nuget push ./nupkg/*.nupkg --source $GITHUB_FEED --skip-duplicate --api-key $GITHUB_TOKEN
       - name: Push to NuGet Feed
         run: dotnet nuget push ./nupkg/*.nupkg --source $NUGET_FEED --skip-duplicate --api-key $NUGET_KEY
- 
- 
