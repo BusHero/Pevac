@@ -36,7 +36,9 @@ jobs:
         run: dotnet test -c Release
       - name: Get Version
         id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+        run: |
+          VERSION=${GITHUB_REF#refs/*/}
+          echo ::set-output name=tag::"${VERSION//v}"
       - name: Pack
         env:
           VERSION: ${{ steps.vars.outputs.tag }}
