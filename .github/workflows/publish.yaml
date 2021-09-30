@@ -1,6 +1,5 @@
 name: Publish Package
 on:
-  workflow_dispatch:
   release:
     types:
       - published
@@ -35,14 +34,13 @@ jobs:
         run: dotnet build -c Release --no-restore
       - name: Test
         run: dotnet test -c Release
+      - name: Get Version
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: Pack
-        run: |
-          arrTag=(${GITHUB_REF//\// })
-          echo arrTag
-          VERSION="${arrTag[2]}"
-          echo Version: $VERSION
-          VERSION="${VERSION//v}"
-          echo Clean Version: $VERSION
+        env:
+          VERSION: ${{ steps.vars.outputs.tag }}
+        run: 
           dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION src/$PROJECT_NAME/$PROJECT_NAME.*proj
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
