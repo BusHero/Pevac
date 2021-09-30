@@ -7,11 +7,12 @@ on:
       - published
 env:
   # Stop wasting time caching packages
+  DOTNET_VERSION: 5.0
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   # Disable sending usage data to Microsoft
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   # Project name to pack and publish
-  PROJECT_NAME: Giraffe
+  PROJECT_NAME: Pevac
   # GitHub Packages Feed settings
   GITHUB_FEED: https://nuget.pkg.github.com/BusHero/index.json
   GITHUB_USER: BusHero
@@ -31,7 +32,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.301
+          dotnet-version: $DOTNET_VERSION
       - name: Restore
         run: dotnet restore
       - name: Build
