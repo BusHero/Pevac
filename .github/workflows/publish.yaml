@@ -42,7 +42,7 @@ jobs:
           echo Version: $VERSION
           VERSION="${VERSION//v}"
           echo Clean Version: $VERSION
-          dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$VERSION src/$PROJECT_NAME/$PROJECT_NAME.*proj
+          dotnet pack -v normal -c Release --include-symbols --include-source -p:PackageVersion=$VERSION src/$PROJECT_NAME/$PROJECT_NAME.*proj
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
