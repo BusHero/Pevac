@@ -38,6 +38,7 @@ jobs:
       - name: Pack
         run: |
           arrTag=(${GITHUB_REF//\// })
+          echo arrTag
           VERSION="${arrTag[2]}"
           echo Version: $VERSION
           VERSION="${VERSION//v}"
