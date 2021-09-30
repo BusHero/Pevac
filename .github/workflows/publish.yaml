@@ -21,7 +21,7 @@ env:
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
 jobs:
   build:
-    runs-on: ubunt-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -50,7 +50,7 @@ jobs:
           path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
   deploy-GitHub:
     needs: build
-    runs-on: ubunt-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v1
