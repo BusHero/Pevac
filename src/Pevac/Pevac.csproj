@@ -23,8 +23,8 @@
     <DocumentationFile>C:\Users\petru\source\repos\Pevac\Pevac\Pevac.xml</DocumentationFile>
     <Optimize>true</Optimize>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+        <None Include="readme.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
