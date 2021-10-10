@@ -9,6 +9,18 @@ namespace Pevac.Tests
 {
     public class ObjectDeserializerTests
     {
+        private record Foo() { }
+
+        private record Bar() : Foo 
+        {
+            public int BarValue { get; set; }
+        }
+
+        private record Baz(): Foo
+        {
+            public string BazValue { get; set; }
+        }
+
         private record Data(string Foo, string Bar)
         {
             public string Foo { get; set; } = Foo;
@@ -21,6 +33,22 @@ namespace Pevac.Tests
 
             public static SubType Copy(Data data) => new(data.Foo, data.Bar, "");
         }
+
+        private Parser<Foo> FooParser { get; } = Parser.ParseObject(propertyName => propertyName switch
+        {
+            "type" => Parser.String.Updater<string, Foo>(),
+            "bar" => Parser.ParseObject(propertyName => propertyName switch
+            {
+                "bar_value" => Parser.Int32.Updater((int data, Bar bar) => bar.BarValue = data),
+                _ => Parser.FailUpdate<Bar>()
+            }, (Foo parent) => new Bar()),
+            "baz" => Parser.ParseObject(propertyName => propertyName switch
+            {
+                "baz_value" => Parser.String.Updater((string data, Baz baz) => baz.BazValue = data),
+                _ => Parser.FailUpdate<Baz>()
+            }, (Foo _) => new Baz()),
+            _ => Parser.FailUpdate<Foo>()
+        });
 
         [Fact]
         public void DeserializeObject()
@@ -37,7 +65,7 @@ namespace Pevac.Tests
             {
                 "foo" => Parser.String.Updater((string foo, Data data) => data with { Foo = foo }),
                 "bar" => Parser.String.Updater((string bar, Data data) => data.Bar = bar),
-                _ => Parser.Failure<Func<Data, Data>>()
+                _ => Parser.FailUpdate<Data>()
             }, new Data("", ""));
 
             Parser.Parse(parser, ref reader, default).Should().Be(new Data("foo", "bar"));
@@ -59,10 +87,47 @@ namespace Pevac.Tests
             {
                 "foo" => Parser.String.Updater((string foo, Data data) => data with { Foo = foo }),
                 "bar" => Parser.String.Updater((string bar, Data data) => data.Bar = bar),
-                _ => Parser.Failure<Func<Data, Data>>()
+                _ => Parser.FailUpdate<Data>()
             }, new Data("", ""));
 
             Parser.Parse(parser, ref reader, default).Should().Be(new Data("foo", "bar"));
+        }
+
+        
+
+        [Fact]
+        public void DeserializeBar()
+        {
+            var json = @"
+            {
+                ""type"": ""bar"",
+                ""bar"": {
+                    ""bar_value"": 1
+                }
+            }";
+
+            var bytes = Encoding.UTF8.GetBytes(json);
+            var reader = new Utf8JsonReader(bytes);
+            reader.Read();
+
+            Parser.Parse(FooParser, ref reader, default).Should().BeEquivalentTo(new Bar { BarValue = 1});
+        }
+
+        [Fact]
+        public void DeserializeBaz()
+        {
+            var json = @"
+            {
+                ""type"": ""bar"",
+                ""baz"": {
+                    ""baz_value"": ""1""
+                }
+            }";
+
+            var bytes = Encoding.UTF8.GetBytes(json);
+            var reader = new Utf8JsonReader(bytes);
+            reader.Read();
+            Parser.Parse(FooParser, ref reader, default).Should().BeEquivalentTo(new Baz { BazValue = "1"});
         }
     }
 }

@@ -81,16 +81,31 @@ namespace Pevac
         public static Parser<T> ParseObject<T>(Func<string, Parser<Func<T, T>>> parserSelector, T @default) => parserSelector switch
         {
             null => throw new ArgumentNullException(nameof(parserSelector)),
-            not null => from updater in ParseObject(parserSelector)
+            not null => from updater in ParseObjectProperties(parserSelector)
                         select updater(@default)
         };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="parserSelector"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static Parser<T> ParseObject<T>(Func<string, Parser<Func<T, T>>> parserSelector) where T: new() => parserSelector switch
+        {
+            null => throw new ArgumentNullException(nameof(parserSelector)),
+            not null => from updater in ParseObjectProperties(parserSelector)
+                        select updater(new T())
+        };
+
 
         /// <summary>
         /// Parses an object with fields
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static Parser<Func<T, T>> ParseObject<T>(Func<string, Parser<Func<T, T>>> parserSelector) => parserSelector switch
+        public static Parser<Func<T, T>> ParseObjectProperties<T>(Func<string, Parser<Func<T, T>>> parserSelector) => parserSelector switch
         {
             null => throw new ArgumentNullException(nameof(parserSelector)),
             not null => PropertyName
@@ -111,7 +126,18 @@ namespace Pevac
         public static Parser<Func<TParent, TParent>> ParseObject<TParent, TChild>(
             Func<string, Parser<Func<TChild, TChild>>> parserSelector,
             Func<TParent, TChild> cast) where TChild : TParent => 
-            from updater in ParseObject(parserSelector)
+            from updater in ParseObjectProperties(parserSelector)
             select new Func<TParent, TParent>(parent => updater(cast(parent)));
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static Parser<Func<T, T>?> FailUpdate<T>(string message = "Some default message") => Failure<Func<T, T>>(message);
+
     }
 }

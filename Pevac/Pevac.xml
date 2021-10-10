@@ -236,6 +236,15 @@
         </member>
         <member name="M:Pevac.Parser.ParseObject``1(System.Func{System.String,Pevac.Parser{System.Func{``0,``0}}})">
             <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parserSelector"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pevac.Parser.ParseObjectProperties``1(System.Func{System.String,Pevac.Parser{System.Func{``0,``0}}})">
+            <summary>
             Parses an object with fields
             </summary>
             <typeparam name="T"></typeparam>
@@ -249,6 +258,14 @@
             <typeparam name="TChild"></typeparam>
             <param name="parserSelector"></param>
             <param name="cast"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pevac.Parser.FailUpdate``1(System.String)">
+            <summary>
+            
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="message"></param>
             <returns></returns>
         </member>
         <member name="M:Pevac.Parser.Then``2(Pevac.Parser{``0},System.Func{``0,Pevac.Parser{``1}})">
