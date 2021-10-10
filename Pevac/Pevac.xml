@@ -51,6 +51,13 @@
         <member name="M:Pevac.Void.ToString">
             <inheritdoc/>
         </member>
+        <member name="T:Pevac.Predicate">
+            <summary>
+            
+            </summary>
+            <param name="reader"></param>
+            <returns></returns>
+        </member>
         <member name="T:Pevac.Parser">
             <summary>
             Contains a bunch of utilities.
@@ -61,6 +68,21 @@
             Creates a parser that succeds if the current token is any of <paramref name="tokens"/>, otherwise fails.
             </summary>
             <param name="tokens"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pevac.Parser.ParsePredicate(Pevac.Predicate)">
+            <summary>
+            
+            </summary>
+            <param name="predicate"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Pevac.Parser.ParseCurrentToken(System.Text.Json.JsonTokenType)">
+            <summary>
+            
+            </summary>
+            <param name="token"></param>
             <returns></returns>
         </member>
         <member name="M:Pevac.Parser.ParseType``1">

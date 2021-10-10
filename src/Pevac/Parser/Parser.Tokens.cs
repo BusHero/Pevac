@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Pevac
 {
@@ -48,13 +46,11 @@ namespace Pevac
         /// </summary>
         public static Parser<Void> StringToken => stringToken ??= ParseToken(JsonTokenType.String);
        
-  
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.Number"/> token.
         /// </summary>
         public static Parser<Void> NumberToken => numberToken ??= ParseToken(JsonTokenType.Number);
     
-     
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.True"/> token.
         /// </summary>
@@ -70,7 +66,6 @@ namespace Pevac
         /// or <see cref="JsonTokenType.False"/> tokens.
         /// </summary>
         public static Parser<Void> BooleanToken => booleanToken ??= ParseToken(JsonTokenType.True, JsonTokenType.False);
-
 
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.Null"/> token.

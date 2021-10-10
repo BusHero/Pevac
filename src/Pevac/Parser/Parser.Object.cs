@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 
 namespace Pevac
 {
@@ -95,7 +96,7 @@ namespace Pevac
             not null => PropertyName
                 .SelectMany(propertyName => parserSelector(propertyName), (_, updater) => updater)
                 .Many()
-                .Between(StartObjectToken, EndObjectToken)
+                .Between(ParseCurrentToken(JsonTokenType.StartObject).Or(StartObjectToken), EndObjectToken)
                 .Select(updaters => new Func<T, T>(t => updaters.Aggregate(t, (data, updater) => updater(data))))
         };
 

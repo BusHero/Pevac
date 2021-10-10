@@ -5,6 +5,13 @@ using System.Text.Json;
 namespace Pevac
 {
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <returns></returns>
+    public delegate bool Predicate(Utf8JsonReader reader);
+
+    /// <summary>
     /// Contains a bunch of utilities.
     /// </summary>
     public static partial class Parser
@@ -18,14 +25,38 @@ namespace Pevac
         {
             return reader.Read() switch
             {
-                false => Result
-                .Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
-                true when tokens.Contains(reader.TokenType) => Result
-                .Success(Void.Default),
-                _ => Result
-                .Failure<Void>(""),
+                false => Result.Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
+                true when tokens.Contains(reader.TokenType) => Result.Success(Void.Default),
+                _ => Result.Failure<Void>(""),
             };
         };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static Parser<Void> ParsePredicate(Predicate predicate) => (ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
+        {
+            var foo = predicate switch
+            {
+                null => throw new ArgumentNullException(nameof(predicate)),
+                not null => predicate(reader) switch
+                {
+                    true => Result.Success(Void.Default),
+                    false => Result.Failure<Void>("Predicate failed")
+                }
+            };
+            return foo;
+        };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public static Parser<Void> ParseCurrentToken(JsonTokenType token) => ParsePredicate(reader => reader.TokenType == token);
 
         /// <summary>
         /// Creates a parser that succeds if a object of type <typeparamref name="T"/> 
