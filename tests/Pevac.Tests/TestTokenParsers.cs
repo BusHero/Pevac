@@ -260,6 +260,15 @@ namespace Pevac.Tests
             Assert.Equal(expectedPropertyName, actualPropertyName);
             Assert.Equal(expectedStringValue, actualStringValue);
         }
+
+        [Theory]
+        [InlineData("{\"foo\": null}", 2)]
+        [InlineData("{\"foo\": \"https://github.com/reactiveui/refit#handling-exceptions\"}", 2)]
+        public void ParseOptionalUri_Succeds(string json, int skip)
+        {
+            var reader = GetReader(json, skip);
+            Parser.OptionalUri.Parse(ref reader, default);
+        }
     }
 
     public static class Utils

@@ -46,10 +46,11 @@ namespace Pevac
         /// Parse an optional <see cref="System.Uri"/> value.
         /// </summary>
         public static Parser<System.Uri?> OptionalUri => optionalUri ??= OptionalStringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUri(UriKind.RelativeOrAbsolute, out var uri) switch
+            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString() switch
             {
-                true => Result.Success(uri),
-                false => Result.Failure<Uri>()
+                null => Result.Success(default(System.Uri)),
+                var x when System.Uri.TryCreate(x, UriKind.RelativeOrAbsolute, out var uri) => Result.Success(uri),
+                _ => Result.Failure<System.Uri>()
             });
 
         /// <summary>
