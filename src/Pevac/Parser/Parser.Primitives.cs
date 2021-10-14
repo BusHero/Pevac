@@ -90,7 +90,7 @@ namespace Pevac
             .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTime(out var value) switch
             {
                 true => Result.Success(value),
-                false => Result.Failure<DateTime>()
+                false => Result.Failure<DateTime>($"Cannot convert '{reader.GetString()}' to a datetime")
             });
 
         /// <summary>

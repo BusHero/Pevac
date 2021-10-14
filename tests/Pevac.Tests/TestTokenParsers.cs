@@ -293,6 +293,43 @@ namespace Pevac.Tests
             Parser.OptionalDecimal.Parse(ref reaader, default).Should().Be(123.123m as decimal?);
         }
 
+        [Fact]
+        public void ParseOptionalGuid_Succeds_OnValidGuid()
+        {
+            Guid guid = System.Guid.NewGuid();
+            var reaader = GetReader($"{{\"foo\": \"{guid}\"}}", 2);
+            Parser.OptionalGuid.Parse(ref reaader, default).Should().Be(guid);
+        }
+
+        [Fact]
+        public void ParserOptionalGuid_Succeds_OnNull()
+        {
+            var reaader = GetReader($"{{\"foo\": null }}", 2);
+            Parser.OptionalGuid.Parse(ref reaader, default).Should().Be(default(Guid?));
+
+        }
+
+        [Fact]
+        public void OptionalDateTime_Succeds_OnNull()
+        {
+            var reaader = GetReader($"{{\"foo\": null }}", 2);
+            Parser.OptionalDateTime.Parse(ref reaader, default).Should().BeNull();
+        }
+
+        [Fact]
+        public void OptionalDateTime_Succeds_OnValid()
+        {
+            var dateTime = new DateTime(2021, 01, 05, 11, 34, 23);
+            var reaader = GetReader($"{{\"foo\": \"{dateTime:o}\" }}", 2);
+            Parser.OptionalDateTime.Parse(ref reaader, default).Should().Be(dateTime);
+        }
+
+        [Fact]
+        public void OptionalBool_Succeds_OnNull()
+        {
+            var reaader = GetReader($"{{\"foo\": null }}", 2);
+            Parser.OptionalBool.Parse(ref reaader, default).Should().BeNull();
+        }
     }
 
     public static class Utils

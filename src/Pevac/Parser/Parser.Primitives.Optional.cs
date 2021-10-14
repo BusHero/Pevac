@@ -25,48 +25,29 @@ namespace Pevac
         /// <summary>
         /// Parse a nullable <see cref="bool"/> value.
         /// </summary>
-        public static Parser<bool?> OptionalBool => optionalBool ??= OptionalBoolToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TokenType switch
-            {
-                JsonTokenType.Null => Result.Success(default(bool?)),
-                _ => Result.Success<bool?>(reader.GetBoolean()),
-            });
+        public static Parser<bool?> OptionalBool => optionalBool ??= (NullToken.Return(default(bool?))).Or(Bool.Select(@bool => @bool as bool?));
 
         /// <summary>
         /// Parse an optional <see cref="System.DateTime"/> value.
         /// </summary>
-        public static Parser<DateTime?> OptionalDateTime => optionalDateTime ??= OptionalStringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetNullableDateTime(out var dateTime) switch
-            {
-                true => Result.Success(dateTime),
-                false => Result.Failure<DateTime?>()
-            });
+        public static Parser<DateTime?> OptionalDateTime => optionalDateTime ??= (NullToken.Return(default(DateTime?))).Or(DateTime.Select(dateTime => dateTime as DateTime?));
 
         /// <summary>
         /// Parse an optional <see cref="System.Uri"/> value.
         /// </summary>
-        public static Parser<System.Uri?> OptionalUri => optionalUri ??= OptionalStringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString() switch
-            {
-                null => Result.Success(default(System.Uri)),
-                var x when System.Uri.TryCreate(x, UriKind.RelativeOrAbsolute, out var uri) => Result.Success(uri),
-                _ => Result.Failure<System.Uri>()
-            });
+        public static Parser<System.Uri?> OptionalUri => optionalUri ??= (NullToken.Return(default(Uri))).Or(Uri);
 
         /// <summary>
         /// Parse a nullable <see cref="Guid"/> value.
         /// </summary>
-        public static Parser<Guid?> OptionalGuid => optionalGuid ??= OptionalStringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetNullableGuid(out var guid) switch
-            {
-                true => Result.Success(guid),
-                false => Result.Failure<Guid?>()
-            });
+        public static Parser<Guid?> OptionalGuid => optionalGuid ??= (NullToken.Return(default(Guid?)))
+            .Or(Guid.Select(value => value as Guid?));
 
         /// <summary>
         /// 
         /// </summary>
-        public static Parser<double?> OptionalDouble => optionalDouble ??= (NullToken.Return(default(double?))).Or(Double.Select(value => value as double?));
+        public static Parser<double?> OptionalDouble => optionalDouble ??= (NullToken.Return(default(double?)))
+            .Or(Double.Select(value => value as double?));
 
         /// <summary>
         /// 

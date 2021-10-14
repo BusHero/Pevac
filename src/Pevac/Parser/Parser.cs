@@ -40,7 +40,7 @@ namespace Pevac
         {
             null => throw new ParseException("Parse value returned a null value."),
             Success<T> success => success.Value,
-            Failure<T> => throw new ParseException("The result of the parse was a failure"),
+            Failure<T> failure => throw new ParseException(failure.Message),
             _ => throw new ParseException("You shouldn't really see this"),
         };
 
