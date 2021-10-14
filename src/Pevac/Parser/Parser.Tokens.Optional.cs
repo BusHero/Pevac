@@ -7,7 +7,7 @@ namespace Pevac
         private static Parser<Void>? optionalBoolToken;
         private static Parser<Void>? optionalFalseToken;
         private static Parser<Void>? optionalTrueToken;
-        private static Parser<Void>? optionalNumber;
+        private static Parser<Void>? optionalNumberToken;
         private static Parser<Void>? optionalStringToken;
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace Pevac
         /// Parser for the <see cref="JsonTokenType.Number"/> 
         /// or <see cref="JsonTokenType.Null"/> token.
         /// </summary>
-        public static Parser<Void> OptionalNumber => optionalNumber ??= ParseToken(JsonTokenType.Number, JsonTokenType.Null);
+        public static Parser<Void> OptionalNumberToken => optionalNumberToken ??= ParseToken(JsonTokenType.Number, JsonTokenType.Null);
 
         /// <summary>
         /// Parser for the <see cref="JsonTokenType.True"/> 

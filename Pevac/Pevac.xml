@@ -442,6 +442,16 @@
             Parse a nullable <see cref="P:Pevac.Parser.Guid"/> value.
             </summary>
         </member>
+        <member name="P:Pevac.Parser.OptionalDouble">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Pevac.Parser.OptionalDecimal">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Pevac.Parser.ParsePropertyName(System.String)">
             <summary>
             
@@ -534,7 +544,7 @@
             or <see cref="F:System.Text.Json.JsonTokenType.None"/> token.
             </summary>
         </member>
-        <member name="P:Pevac.Parser.OptionalNumber">
+        <member name="P:Pevac.Parser.OptionalNumberToken">
             <summary>
             Parser for the <see cref="F:System.Text.Json.JsonTokenType.Number"/> 
             or <see cref="F:System.Text.Json.JsonTokenType.Null"/> token.

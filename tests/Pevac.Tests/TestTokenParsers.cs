@@ -269,6 +269,30 @@ namespace Pevac.Tests
             var reader = GetReader(json, skip);
             Parser.OptionalUri.Parse(ref reader, default);
         }
+
+        [Theory]
+        [InlineData("{\"foo\": null}", 2, null)]
+        [InlineData("{\"foo\": 123.123}", 2, 123.123)]
+        public void ParseOptionalDouble_Succeds(string json, int skip, double? value)
+        {
+            var reader = GetReader(json, skip);
+            Parser.OptionalDouble.Parse(ref reader, default).Should().Be(value);
+        }
+
+        [Fact]
+        public void ParseOptionalDecimal_Succeds_OnNull()
+        {
+            var reader = GetReader("{\"foo\": null}", 2);
+            Parser.OptionalDecimal.Parse(ref reader, default).Should().BeNull();
+        }
+
+        [Fact]
+        public void ParseOptionalDecimal_Succeds_OnValue()
+        {
+            var reaader = GetReader("{\"foo\": 123.123}", 2);
+            Parser.OptionalDecimal.Parse(ref reaader, default).Should().Be(123.123m as decimal?);
+        }
+
     }
 
     public static class Utils

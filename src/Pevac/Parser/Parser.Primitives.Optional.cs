@@ -3,8 +3,6 @@ using System.Text.Json;
 
 namespace Pevac
 {
-
-
     public static partial class Parser
     {
         private static Parser<DateTime?>? optionalDateTime;
@@ -12,6 +10,8 @@ namespace Pevac
         private static Parser<Guid?>? optionalGuid;
         private static Parser<string?>? optionalString;
         private static Parser<bool?>? optionalBool;
+        private static Parser<double?>? optionalDouble;
+        private static Parser<decimal?>? optionalDecimal;
 
         /// <summary>
         /// Parse an optional <see cref="string"/> value.
@@ -62,5 +62,18 @@ namespace Pevac
                 true => Result.Success(guid),
                 false => Result.Failure<Guid?>()
             });
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static Parser<double?> OptionalDouble => optionalDouble ??= (NullToken.Return(default(double?))).Or(Double.Select(value => value as double?));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static Parser<decimal?> OptionalDecimal => optionalDecimal ??= (NullToken.Return(default(decimal?)))
+            .Or(Decimal.Select(value => value as decimal?));
+
+            
     }
 }
