@@ -1,228 +1,219 @@
-﻿using System;
-using System.Linq;
+﻿
+using System;
 using System.Text.Json;
 
-namespace Pevac
+namespace Pevac;
+
+public partial class Parser
 {
-    public partial class Parser
-    {
-        private static Parser<Void>? emptyObject;
-        private static Parser<Uri?>? uri;
-        private static Parser<int>? int32;
-        private static Parser<long>? int64;
-        private static Parser<sbyte>? sByte;
-        private static Parser<float>? single;
-        private static Parser<string>? propertyName;
-        private static Parser<ulong>? uInt64;
-        private static Parser<uint>? uInt32;
-        private static Parser<ushort>? uInt16;
-        private static Parser<short>? int16;
-        private static Parser<double>? @double;
-        private static Parser<decimal>? @decimal;
-        private static Parser<DateTimeOffset>? dateTimeOffset;
-        private static Parser<DateTime>? dateTime;
-        private static Parser<byte[]?>? bytesFromBase64;
-        private static Parser<byte>? @byte;
-        private static Parser<Guid>? guid;
-        private static Parser<bool>? @bool;
-        private static Parser<string?>? @string;
+    private static Parser<Void>? emptyObject;
+    private static Parser<Uri?>? uri;
+    private static Parser<int>? int32;
+    private static Parser<long>? int64;
+    private static Parser<sbyte>? sByte;
+    private static Parser<float>? single;
+    private static Parser<string>? propertyName;
+    private static Parser<ulong>? uInt64;
+    private static Parser<uint>? uInt32;
+    private static Parser<ushort>? uInt16;
+    private static Parser<short>? int16;
+    private static Parser<double>? @double;
+    private static Parser<decimal>? @decimal;
+    private static Parser<DateTimeOffset>? dateTimeOffset;
+    private static Parser<DateTime>? dateTime;
+    private static Parser<byte[]?>? bytesFromBase64;
+    private static Parser<byte>? @byte;
+    private static Parser<Guid>? guid;
+    private static Parser<bool>? @bool;
+    private static Parser<string?>? @string;
 
-        /// <summary>
-        /// Parse a <see cref="string"/> value.
-        /// </summary>
-        public static Parser<string?> String => @string ??= StringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
-            {
-                return Result
-                .Success(reader.GetString());
-            });
+    /// <summary>
+    /// Parse a <see cref="string"/> value.
+    /// </summary>
+    public static Parser<string?> String => @string ??= StringToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
+        {
+            return Result.Success(reader.GetString());
+        });
 
-        /// <summary>
-        /// Parse a <see cref="bool"/> value.
-        /// </summary>
-        public static Parser<bool> Bool => @bool ??= BooleanToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
-            {
-                return Result
-                .Success(reader.GetBoolean());
-            });
+    /// <summary>
+    /// Parse a <see cref="bool"/> value.
+    /// </summary>
+    public static Parser<bool> Bool => @bool ??= BooleanToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) =>
+        {
+            return Result.Success(reader.GetBoolean());
+        });
 
-        /// <summary>
-        /// Parse a <see cref="System.Guid"/> value.
-        /// </summary>
-        public static Parser<Guid> Guid => guid ??= StringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetGuid(out var guid) switch
-            {
-                true => Result
-                .Success(guid),
-                false => Result
-                .Failure<Guid>()
-            });
+    /// <summary>
+    /// Parse a <see cref="System.Guid"/> value.
+    /// </summary>
+    public static Parser<Guid> Guid => guid ??= StringToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetGuid(out var guid) switch
+        {
+            true => Result.Success(guid),
+            false => Result.Failure<Guid>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="byte"/> value.
-        /// </summary>
-        public static Parser<byte> Byte => @byte ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetByte(out var value) switch
-            {
-                true => Result
-                .Success(value),
-                false => Result
-                .Failure<byte>("Cannot convert the current token to a byte value")
-            });
+    /// <summary>
+    /// Parse a <see cref="byte"/> value.
+    /// </summary>
+    public static Parser<byte> Byte => @byte ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetByte(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<byte>("Cannot convert the current token to a byte value")
+        });
 
-        /// <summary>
-        /// Parse a bynary value codded as an array <see cref="byte"/>.
-        /// </summary>
-        public static Parser<byte[]?> BytesFromBase64 => bytesFromBase64 ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetBytesFromBase64(out var value) switch
-            {
-                true => Result
-                .Success(value),
-                false => Result
-                .Failure<byte[]?>("Cannot convert the current token into a byte array")
-            });
+    /// <summary>
+    /// Parse a bynary value codded as an array <see cref="byte"/>.
+    /// </summary>
+    public static Parser<byte[]?> BytesFromBase64 => bytesFromBase64 ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetBytesFromBase64(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<byte[]?>("Cannot convert the current token into a byte array")
+        });
 
-        /// <summary>
-        /// Parse a <see cref="System.DateTime"/> value.
-        /// </summary>
-        public static Parser<DateTime> DateTime => dateTime ??= OptionalStringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTime(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<DateTime>($"Cannot convert '{reader.GetString()}' to a datetime")
-            });
+    /// <summary>
+    /// Parse a <see cref="System.DateTime"/> value.
+    /// </summary>
+    public static Parser<DateTime> DateTime => dateTime ??= OptionalStringToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTime(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<DateTime>($"Cannot convert '{reader.GetString()}' to a datetime")
+        });
 
-        /// <summary>
-        /// Parse a <see cref="System.DateTimeOffset"/> value.
-        /// </summary>
-        public static Parser<DateTimeOffset> DateTimeOffset => dateTimeOffset ??= StringToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTimeOffset(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<DateTimeOffset>()
-            });
+    /// <summary>
+    /// Parse a <see cref="System.DateTimeOffset"/> value.
+    /// </summary>
+    public static Parser<DateTimeOffset> DateTimeOffset => dateTimeOffset ??= StringToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTimeOffset(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<DateTimeOffset>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="decimal"/> value.
-        /// </summary>
-        public static Parser<decimal> Decimal => @decimal ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDecimal(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<decimal>()
-            });
+    /// <summary>
+    /// Parse a <see cref="decimal"/> value.
+    /// </summary>
+    public static Parser<decimal> Decimal => @decimal ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDecimal(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<decimal>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="double"/> value.
-        /// </summary>
-        public static Parser<double> Double => @double ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDouble(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<double>()
-            });
+    /// <summary>
+    /// Parse a <see cref="double"/> value.
+    /// </summary>
+    public static Parser<double> Double => @double ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDouble(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<double>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="short"/> value.
-        /// </summary>
-        public static Parser<short> Int16 => int16 ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt16(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<short>()
-            });
+    /// <summary>
+    /// Parse a <see cref="short"/> value.
+    /// </summary>
+    public static Parser<short> Int16 => int16 ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt16(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<short>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="int"/> value.
-        /// </summary>
-        public static Parser<int> Int32 => int32 ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt32(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<int>()
-            });
+    /// <summary>
+    /// Parse a <see cref="int"/> value.
+    /// </summary>
+    public static Parser<int> Int32 => int32 ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt32(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<int>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="long"/> value.
-        /// </summary>
-        public static Parser<long> Int64 => int64 ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt64(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<long>()
-            });
+    /// <summary>
+    /// Parse a <see cref="long"/> value.
+    /// </summary>
+    public static Parser<long> Int64 => int64 ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt64(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<long>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="sbyte"/> value.
-        /// </summary>
-        public static Parser<sbyte> SByte => sByte ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetSByte(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<sbyte>()
-            });
+    /// <summary>
+    /// Parse a <see cref="sbyte"/> value.
+    /// </summary>
+    public static Parser<sbyte> SByte => sByte ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetSByte(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<sbyte>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="float"/> value.
-        /// </summary>
-        public static Parser<float> Single => single ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetSingle(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<float>()
-            });
+    /// <summary>
+    /// Parse a <see cref="float"/> value.
+    /// </summary>
+    public static Parser<float> Single => single ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetSingle(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<float>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="ushort"/> value.
-        /// </summary>
-        public static Parser<ushort> UInt16 => uInt16 ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt16(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<ushort>()
-            });
+    /// <summary>
+    /// Parse a <see cref="ushort"/> value.
+    /// </summary>
+    public static Parser<ushort> UInt16 => uInt16 ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt16(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<ushort>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="uint"/> value.
-        /// </summary>
-        public static Parser<uint> UInt32 => uInt32 ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt32(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<uint>()
-            });
+    /// <summary>
+    /// Parse a <see cref="uint"/> value.
+    /// </summary>
+    public static Parser<uint> UInt32 => uInt32 ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt32(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<uint>()
+        });
 
-        /// <summary>
-        /// Parse a <see cref="ulong"/> value.
-        /// </summary>
-        public static Parser<ulong> UInt64 => uInt64 ??= NumberToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt64(out var value) switch
-            {
-                true => Result.Success(value),
-                false => Result.Failure<ulong>()
-            });
+    /// <summary>
+    /// Parse a <see cref="ulong"/> value.
+    /// </summary>
+    public static Parser<ulong> UInt64 => uInt64 ??= NumberToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt64(out var value) switch
+        {
+            true => Result.Success(value),
+            false => Result.Failure<ulong>()
+        });
 
-        /// <summary>
-        /// Parse a property name value.
-        /// </summary>
-        public static Parser<string> PropertyName => propertyName ??= PropertyNameToken
-            .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString() switch
-            {
-                null => throw new ParseException(),
-                string propertyName => Result.Success(propertyName),
-            });
+    /// <summary>
+    /// Parse a property name value.
+    /// </summary>
+    public static Parser<string> PropertyName => propertyName ??= PropertyNameToken
+        .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString() switch
+        {
+            null => throw new ParseException(),
+            string propertyName => Result.Success(propertyName),
+        });
 
-        /// <summary>
-        /// Parse a <see cref="System.Uri"/> value.
-        /// </summary>
-        public static Parser<System.Uri?> Uri => uri ??= from uri in String
-                                                         select new Uri(uri);
+    /// <summary>
+    /// Parse a <see cref="System.Uri"/> value.
+    /// </summary>
+    public static Parser<System.Uri?> Uri => uri ??= from uri in String
+                                                     select new Uri(uri);
 
-        /// <summary>
-        /// Parses an empty object.
-        /// </summary>
-        public static Parser<Void> EmptyObject => emptyObject ??= StartObjectToken
-            .Then(EndObjectToken);
-    }
+    /// <summary>
+    /// Parses an empty object.
+    /// </summary>
+    public static Parser<Void> EmptyObject => emptyObject ??= StartObjectToken
+        .Then(EndObjectToken);
 }
