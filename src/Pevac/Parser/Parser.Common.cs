@@ -28,7 +28,7 @@ public static partial class Parser
         {
             false => Result.Failure<Void>("Cannot read the next token. You've probably reached the end of stream"),
             true when tokens.Contains(reader.TokenType) => Result.Success(Void.Default),
-            _ => Result.Failure<Void>(""),
+            _ => Result.Failure<Void>($"Wrong token! Expected [{string.Join(',', tokens)}]; Actual {reader.TokenType}"),
         };
     };
 

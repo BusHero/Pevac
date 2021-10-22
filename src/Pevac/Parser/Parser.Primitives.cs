@@ -52,7 +52,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetGuid(out var guid) switch
         {
             true => Result.Success(guid),
-            false => Result.Failure<Guid>()
+            false => Result.Failure<Guid>($"Cannot convert '{reader.GetString()}' to Guid")
         });
 
     /// <summary>

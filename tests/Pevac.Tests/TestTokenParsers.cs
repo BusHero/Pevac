@@ -82,6 +82,20 @@ public class ParserTests
         Parser.Parse(Parser.OptionalGuid, ref reader, default).Should().Be(guid);
     }
 
+
+    [Fact]
+    public void Guid_Fails_OnInvalidGuid()
+    {
+        var invalidGuid = "some-invalid-guid";
+
+        var action = () =>
+        {
+            var reader = GetReader($"\"{invalidGuid}\"", 0);
+            Parser.Guid.Parse(ref reader, default);
+        };
+        action.Should().Throw<ParseException>().WithMessage($"Cannot convert '{invalidGuid}' to Guid");
+    }
+
     [Theory]
     [InlineData(@"{""foo"": ""bar""}", "foo")]
     [InlineData(@"{""bar"": ""bar""}", "bar")]
@@ -329,6 +343,17 @@ public class ParserTests
     {
         var reaader = GetReader($"{{\"foo\": null }}", 2);
         Parser.OptionalBool.Parse(ref reaader, default).Should().BeNull();
+    }
+
+    [Fact]
+    public void Foo()
+    {
+        var action = () => {
+            var reaader = GetReader($"{{\"foo\": null }}", 0);
+            return Parser.StringToken.Parse(ref reaader, default);
+        };
+
+        action.Should().Throw<ParseException>().WithMessage("Wrong token! Expected [String]; Actual StartObject");
     }
 }
 
