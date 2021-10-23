@@ -102,23 +102,24 @@
         </member>
         <member name="M:Pevac.Parser.TryParse``1(Pevac.Parser{``0},System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
             <summary>
-            
+            Tries to parse the input without throwing an exception.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="parser"></param>
-            <param name="reader"></param>
-            <param name="options"></param>
-            <returns></returns>
+            <typeparam name="T">The type of the result.</typeparam>
+            <param name="parser">The parser.</param>
+            <param name="reader">The input reader.</param>
+            <param name="options">The options for the reader.</param>
+            <returns>The result of the parser.</returns>
         </member>
         <member name="M:Pevac.Parser.Parse``1(Pevac.Parser{``0},System.Text.Json.Utf8JsonReader@,System.Text.Json.JsonSerializerOptions)">
             <summary>
-            
+            Parsers the specified reader.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="parser"></param>
-            <param name="reader"></param>
-            <param name="options"></param>
-            <returns></returns>
+            <typeparam name="T">The type of the result.</typeparam>
+            <param name="parser">The parser.</param>
+            <param name="reader">The input reader.</param>
+            <param name="options">The options used by the reader.</param>
+            <returns>The result of the parser.</returns>
+            <exception cref="T:Pevac.ParseException">It contains the details of the parsing error.</exception>
         </member>
         <member name="M:Pevac.Parser.Failure``1(System.String)">
             <summary>
@@ -461,7 +462,7 @@
         </member>
         <member name="M:Pevac.Parser.ParseStringProperty(System.String)">
             <summary>
-            
+            Generates a parser that will succed
             </summary>
             <param name="expectedPropertyName"></param>
             <returns></returns>

@@ -18,7 +18,7 @@ public static partial class Parser
     };
 
     /// <summary>
-    /// 
+    /// Generates a parser that will succed
     /// </summary>
     /// <param name="expectedPropertyName"></param>
     /// <returns></returns>

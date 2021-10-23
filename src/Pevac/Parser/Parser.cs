@@ -15,33 +15,35 @@ namespace Pevac
     public static partial class Parser
     {
         /// <summary>
-        /// 
+        /// Tries to parse the input without throwing an exception.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="parser"></param>
-        /// <param name="reader"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the result.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="reader">The input reader.</param>
+        /// <param name="options">The options for the reader.</param>
+        /// <returns>The result of the parser.</returns>
         public static IResult<T?>? TryParse<T>(this Parser<T?> parser, ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser switch
         {
             null => throw new ArgumentNullException(nameof(parser)),
             not null => parser(ref reader, options),
         };
 
+        
         /// <summary>
-        /// 
+        /// Parsers the specified reader.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="parser"></param>
-        /// <param name="reader"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of the result.</typeparam>
+        /// <param name="parser">The parser.</param>
+        /// <param name="reader">The input reader.</param>
+        /// <param name="options">The options used by the reader.</param>
+        /// <returns>The result of the parser.</returns>
+        /// <exception cref="ParseException">It contains the details of the parsing error.</exception>
         public static T? Parse<T>(this Parser<T?> parser, ref Utf8JsonReader reader, JsonSerializerOptions? options) => parser(ref reader, options) switch
         {
             null => throw new ParseException("Parse value returned a null value."),
             Success<T> success => success.Value,
             Failure<T> failure => throw new ParseException(failure.Message),
-            _ => throw new ParseException("You shouldn't really see this"),
+            var x => throw new ParseException($"You shouldn't really see this {x}"),
         };
 
         /// <summary>

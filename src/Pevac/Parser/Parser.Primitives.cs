@@ -92,7 +92,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDateTimeOffset(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<DateTimeOffset>()
+            false => Result.Failure<DateTimeOffset>($"Cannot convert '{reader.GetString()}' to DateTime")
         });
 
     /// <summary>
@@ -102,7 +102,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDecimal(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<decimal>()
+            false => Result.Failure<decimal>($"Cannot convert the value to decimal")
         });
 
     /// <summary>
@@ -112,7 +112,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetDouble(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<double>()
+            false => Result.Failure<double>($"Cannot convert the value to double")
         });
 
     /// <summary>
@@ -122,7 +122,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt16(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<short>()
+            false => Result.Failure<short>($"Cannot convert the value to short")
         });
 
     /// <summary>
@@ -132,7 +132,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt32(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<int>()
+            false => Result.Failure<int>($"Cannot convert value to int")
         });
 
     /// <summary>
@@ -142,7 +142,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetInt64(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<long>()
+            false => Result.Failure<long>("Cannot convert value to long")
         });
 
     /// <summary>
@@ -152,7 +152,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetSByte(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<sbyte>()
+            false => Result.Failure<sbyte>("Cannot convert value to sbyte")
         });
 
     /// <summary>
@@ -162,7 +162,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetSingle(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<float>()
+            false => Result.Failure<float>("Cannot convert value to float")
         });
 
     /// <summary>
@@ -172,7 +172,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt16(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<ushort>()
+            false => Result.Failure<ushort>("Cannot convert value to ushort")
         });
 
     /// <summary>
@@ -182,7 +182,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt32(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<uint>()
+            false => Result.Failure<uint>("Cannot convert value to uint")
         });
 
     /// <summary>
@@ -192,7 +192,7 @@ public partial class Parser
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.TryGetUInt64(out var value) switch
         {
             true => Result.Success(value),
-            false => Result.Failure<ulong>()
+            false => Result.Failure<ulong>("Cannot convert value to ulong")
         });
 
     /// <summary>
@@ -201,7 +201,7 @@ public partial class Parser
     public static Parser<string> PropertyName => propertyName ??= PropertyNameToken
         .Then((ref Utf8JsonReader reader, JsonSerializerOptions? _) => reader.GetString() switch
         {
-            null => throw new ParseException(),
+            null => throw new ParseException("Cannot get the string value"),
             string propertyName => Result.Success(propertyName),
         });
 
