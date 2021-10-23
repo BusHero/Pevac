@@ -208,9 +208,12 @@ public partial class Parser
     /// <summary>
     /// Parse a <see cref="System.Uri"/> value.
     /// </summary>
-    public static Parser<System.Uri?> Uri => uri ??= from uri in String
-                                                     select new Uri(uri);
-
+    public static Parser<System.Uri?> Uri => uri ??= String.Select(uri =>
+        {
+            System.Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var @return);
+            return @return;
+        });
+        
     /// <summary>
     /// Parses an empty object.
     /// </summary>
