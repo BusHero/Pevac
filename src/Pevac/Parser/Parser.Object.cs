@@ -71,6 +71,8 @@ public static partial class Parser
         from _ in parser
         select (U u) => u;
 
+    public static Parser<Func<T, T>> Updater<T>(this Parser<object> parser) => parser.Then(Parser.Return((T t) => t));
+
     /// <summary>
     /// Parses an object with fields
     /// </summary>
@@ -128,8 +130,6 @@ public static partial class Parser
         Func<TParent, TChild> cast) where TChild : TParent =>
         from updater in ParseObjectProperties(parserSelector)
         select TParent (TParent parent) => updater(cast(parent));
-
-
 
     /// <summary>
     /// 

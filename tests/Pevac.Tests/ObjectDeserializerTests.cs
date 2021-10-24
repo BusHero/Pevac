@@ -21,6 +21,8 @@ public class ObjectDeserializerTests
 
     private record Data(string Foo, string Bar)
     {
+        public Data(): this(default, default) { }
+
         public string Foo { get; set; } = Foo;
         public string Bar { get; set; } = Bar;
     }
@@ -126,5 +128,25 @@ public class ObjectDeserializerTests
         var reader = new Utf8JsonReader(bytes);
         reader.Read();
         Parser.Parse(FooParser, ref reader, default).Should().BeEquivalentTo(new Baz { BazValue = "1" });
+    }
+
+    [Fact]
+    public void Deserializer_Succeds()
+    {
+        
+        var json = @"
+            {
+                ""foo"": ""foo"",
+                ""bar"": ""baz""
+            }";
+        var bytes = Encoding.UTF8.GetBytes(json);
+        var reader = new Utf8JsonReader(bytes);
+        reader.Read();
+        var data = Parser.ParseObject(propertyName => propertyName switch
+        {
+            "foo" => Parser.String.Updater((string type, Data data) => data with { Foo = type}),
+            "bar" => Parser.String.Updater<Data>(),
+            _ => Parser.FailUpdate<Data>()
+        }, new Data("default-value", "default-value")).Parse(ref reader, default).Should().BeEquivalentTo(new Data("foo", "default-value"));
     }
 }
