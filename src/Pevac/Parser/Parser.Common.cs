@@ -72,7 +72,7 @@ public static partial class Parser
             var result = JsonSerializer.Deserialize<T>(ref reader, options);
             return Result.Success(result);
         }
-        catch (Execption e)
+        catch (Exception e)
         {
             return Result.Failure<T>(e.Message);
         }
@@ -95,6 +95,7 @@ public static partial class Parser
     };
 
     private static Parser<Void>? ignored;
+    
     
     public static Parser<Void> Ignored => ignored ??= (ref Utf8JsonReader reader, JsonSerializerOptions? options) =>
     {
