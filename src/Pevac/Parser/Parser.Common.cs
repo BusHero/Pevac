@@ -93,4 +93,15 @@ public static partial class Parser
             var result => result
         };
     };
+
+    private static Parser<Void>? ignored;
+    
+    public static Parser<Void> Ignored => ignored ??= (ref Utf8JsonReader reader, JsonSerializerOptions? options) =>
+    {
+        return reader.TrySkip() switch
+        {
+            true => Pevac.Result.Success(Void.Default),
+            false => Pevac.Result.Failure<Void>("Cannot skip")
+        };
+    };
 }
