@@ -72,7 +72,7 @@ public static partial class Parser
             var result = JsonSerializer.Deserialize<T>(ref reader, options);
             return Result.Success(result);
         }
-        catch (JsonException e)
+        catch (Execption e)
         {
             return Result.Failure<T>(e.Message);
         }
