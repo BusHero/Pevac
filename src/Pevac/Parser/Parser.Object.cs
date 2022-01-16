@@ -14,7 +14,7 @@ public static partial class Parser
     /// <returns></returns>
     public static Parser<Func<U, U>> Updater<T, U>(this Parser<T> parser, Func<T, U, U> func) =>
         from t in parser
-        select (U u) => func(t, u);
+        select new Func<U, U>((U u) => func(t, u));
 
     /// <summary>
     /// Creates an updater.
@@ -26,11 +26,11 @@ public static partial class Parser
     /// <returns></returns>
     public static Parser<Func<U, U>> Updater<T, U>(this Parser<T> parser, Action<T, U> action) =>
         from t in parser
-        select (U u) =>
+        select new Func<U, U>((U u) =>
         {
             action(t, u);
             return u;
-        };
+        });
 
     /// <summary>
     /// Creates an updater.
@@ -54,11 +54,11 @@ public static partial class Parser
     /// <returns></returns>
     public static Parser<Func<U, U>> Updater<T, U>(this Parser<T> parser, Action<U> action) =>
         from _ in parser
-        select (U u) =>
+        select new Func<U, U>((U u) =>
         {
             action(u);
             return u;
-        };
+        });
 
     /// <summary>
     /// Creates an identity updater
@@ -69,7 +69,7 @@ public static partial class Parser
     /// <returns></returns>
     public static Parser<Func<U, U>> Updater<T, U>(this Parser<T> parser) =>
         from _ in parser
-        select (U u) => u;
+        select new Func<U, U>((U u) => u);
 
     public static Parser<Func<T, T>> Updater<T>(this Parser<object> parser) => parser.Then(Parser.Return((T t) => t));
 
@@ -114,7 +114,7 @@ public static partial class Parser
             .SelectMany(propertyName => parserSelector(propertyName), (_, updater) => updater)
             .Many()
             .Between(ParseCurrentToken(JsonTokenType.StartObject).Or(StartObjectToken), EndObjectToken)
-            .Select(updaters => (T t) => updaters.Aggregate(t, (data, updater) => updater(data)))
+            .Select(updaters => new Func<T, T>((T t) => updaters.Aggregate(t, (data, updater) => updater(data))))
     };
 
     /// <summary>
@@ -129,7 +129,7 @@ public static partial class Parser
         Func<string, Parser<Func<TChild, TChild>>> parserSelector,
         Func<TParent, TChild> cast) where TChild : TParent =>
         from updater in ParseObjectProperties(parserSelector)
-        select TParent (TParent parent) => updater(cast(parent));
+        select new Func<TParent, TParent>((TParent parent) => updater(cast(parent)));
 
     /// <summary>
     /// 
