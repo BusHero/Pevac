@@ -2,6 +2,7 @@
 
   <PropertyGroup>  
     <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <VersionPrefix>0.3.0</VersionPrefix>
     <Authors>Cervac Petru</Authors>

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,5 +19,11 @@
     <ProjectReference Include="..\..\src\Pevac\Pevac.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit"/>
+    <Using Include="FluentAssertions"/>
+    <Using Include="Pevac"/>
+    
+  </ItemGroup>
 
 </Project>
